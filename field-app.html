@@ -1,1552 +1,2250 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
-  <title>APR Field App — Aquatic Paradise Rentals</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
-  <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-    :root {
-      --navy:   #0B1E3D;
-      --navy2:  #162B4F;
-      --amber:  #F59E0B;
-      --amber2: #FBBF24;
-      --green:  #22C55E;
-      --red:    #EF4444;
-      --slate:  #94A3B8;
-      --white:  #F8FAFC;
-      --card:   #0F2544;
-      --border: rgba(255,255,255,0.08);
-    }
-
-    html, body {
-      min-height: 100vh;
-      background: var(--navy);
-      color: var(--white);
-      font-family: 'Inter', system-ui, sans-serif;
-      font-size: 16px;
-      -webkit-font-smoothing: antialiased;
-    }
-
-    /* ── TOP BAR ── */
-    .topbar {
-      position: sticky;
-      top: 0;
-      z-index: 100;
-      background: var(--navy);
-      border-bottom: 1px solid var(--border);
-      padding: 14px 20px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-
-    .topbar-brand {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .topbar-logo {
-      width: 32px;
-      height: 32px;
-      background: var(--amber);
-      border-radius: 8px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 18px;
-    }
-
-    .topbar-name {
-      font-size: 14px;
-      font-weight: 700;
-      letter-spacing: 0.06em;
-      text-transform: uppercase;
-      color: var(--white);
-    }
-
-    .topbar-name span {
-      color: var(--amber);
-    }
-
-    .topbar-status {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      font-family: 'DM Mono', monospace;
-      font-size: 11px;
-      color: var(--slate);
-    }
-
-    .status-dot {
-      width: 7px;
-      height: 7px;
-      border-radius: 50%;
-      background: var(--green);
-      box-shadow: 0 0 0 0 rgba(34,197,94,0.6);
-      animation: pulse-dot 2s infinite;
-    }
-
-    @keyframes pulse-dot {
-      0%   { box-shadow: 0 0 0 0 rgba(34,197,94,0.6); }
-      70%  { box-shadow: 0 0 0 6px rgba(34,197,94,0); }
-      100% { box-shadow: 0 0 0 0 rgba(34,197,94,0); }
-    }
-
-    /* ── MAIN LAYOUT ── */
-    .app-main {
-      padding: 20px 16px 40px;
-      max-width: 480px;
-      margin: 0 auto;
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-    }
-
-    /* ── ORDER BANNER ── */
-    .order-banner {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-left: 3px solid var(--amber);
-      border-radius: 10px;
-      padding: 14px 16px;
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-    }
-
-    .order-label {
-      font-family: 'DM Mono', monospace;
-      font-size: 10px;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      color: var(--amber);
-    }
-
-    .order-id {
-      font-family: 'DM Mono', monospace;
-      font-size: 20px;
-      font-weight: 500;
-      color: var(--white);
-      letter-spacing: 0.04em;
-    }
-
-    .order-meta {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 8px;
-      margin-top: 4px;
-    }
-
-    .order-meta-item {
-      display: flex;
-      flex-direction: column;
-      gap: 2px;
-    }
-
-    .order-meta-item .meta-key {
-      font-size: 10px;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      color: var(--slate);
-      font-family: 'DM Mono', monospace;
-    }
-
-    .order-meta-item .meta-val {
-      font-size: 13px;
-      font-weight: 600;
-      color: var(--white);
-    }
-
-    /* ── CARD ── */
-    .field-card {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      overflow: hidden;
-    }
-
-    .card-header {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 14px 16px;
-      border-bottom: 1px solid var(--border);
-    }
-
-    .card-icon {
-      width: 34px;
-      height: 34px;
-      border-radius: 8px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 16px;
-      flex-shrink: 0;
-    }
-
-    .card-icon.amber { background: rgba(245,158,11,0.15); }
-    .card-icon.blue  { background: rgba(59,130,246,0.15); }
-    .card-icon.green { background: rgba(34,197,94,0.15); }
-
-    .card-title {
-      font-size: 14px;
-      font-weight: 700;
-      color: var(--white);
-      letter-spacing: 0.02em;
-    }
-
-    .card-subtitle {
-      font-size: 11px;
-      color: var(--slate);
-      margin-top: 1px;
-    }
-
-    .card-badge {
-      margin-left: auto;
-      font-family: 'DM Mono', monospace;
-      font-size: 10px;
-      padding: 3px 8px;
-      border-radius: 20px;
-      letter-spacing: 0.06em;
-      text-transform: uppercase;
-    }
-
-    .badge-pending { background: rgba(245,158,11,0.15); color: var(--amber); }
-    .badge-done    { background: rgba(34,197,94,0.15);  color: var(--green); }
-    .badge-live    { background: rgba(59,130,246,0.15); color: #60A5FA; }
-
-    .card-body { padding: 16px; }
-
-    /* ── PHOTO CAPTURE ── */
-    .photo-slot {
-      position: relative;
-      width: 100%;
-      aspect-ratio: 16/10;
-      border-radius: 8px;
-      overflow: hidden;
-      border: 2px dashed var(--border);
-      background: rgba(255,255,255,0.03);
-      cursor: pointer;
-      transition: border-color 0.2s, background 0.2s;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-direction: column;
-      gap: 8px;
-    }
-
-    .photo-slot:hover {
-      border-color: rgba(245,158,11,0.4);
-      background: rgba(245,158,11,0.04);
-    }
-
-    .photo-slot.has-image {
-      border-style: solid;
-      border-color: var(--amber);
-    }
-
-    .photo-slot img.captured {
-      position: absolute;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-
-    .photo-slot .slot-placeholder {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 8px;
-      color: var(--slate);
-      pointer-events: none;
-    }
-
-    .slot-icon {
-      width: 48px;
-      height: 48px;
-      border-radius: 12px;
-      background: rgba(255,255,255,0.06);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 22px;
-    }
-
-    .slot-label {
-      font-size: 13px;
-      font-weight: 600;
-      color: var(--slate);
-    }
-
-    .slot-hint {
-      font-size: 11px;
-      color: rgba(148,163,184,0.6);
-      font-family: 'DM Mono', monospace;
-    }
-
-    /* ID card frame guide */
-    .id-frame-guide {
-      position: absolute;
-      inset: 10%;
-      border: 2px solid rgba(245,158,11,0.3);
-      border-radius: 8px;
-      pointer-events: none;
-    }
-
-    .id-frame-guide::before,
-    .id-frame-guide::after {
-      content: '';
-      position: absolute;
-      width: 16px;
-      height: 16px;
-      border-color: var(--amber);
-      border-style: solid;
-    }
-
-    .id-frame-guide::before {
-      top: -2px;
-      left: -2px;
-      border-width: 2px 0 0 2px;
-      border-radius: 2px 0 0 0;
-    }
-
-    .id-frame-guide::after {
-      bottom: -2px;
-      right: -2px;
-      border-width: 0 2px 2px 0;
-      border-radius: 0 0 2px 2px;
-    }
-
-    .photo-overlay {
-      position: absolute;
-      inset: 0;
-      display: flex;
-      align-items: flex-end;
-      padding: 10px;
-      background: linear-gradient(to top, rgba(11,30,61,0.85) 0%, transparent 50%);
-      opacity: 0;
-      transition: opacity 0.2s;
-    }
-
-    .photo-slot.has-image .photo-overlay { opacity: 1; }
-
-    .photo-retake {
-      font-size: 11px;
-      color: var(--amber2);
-      font-family: 'DM Mono', monospace;
-      letter-spacing: 0.06em;
-      cursor: pointer;
-      background: rgba(245,158,11,0.15);
-      border: 1px solid rgba(245,158,11,0.3);
-      border-radius: 4px;
-      padding: 4px 10px;
-    }
-
-    /* Camera video overlay */
-    .camera-overlay {
-      display: none;
-      position: fixed;
-      inset: 0;
-      z-index: 200;
-      background: #000;
-      flex-direction: column;
-    }
-
-    .camera-overlay.active { display: flex; }
-
-    .camera-view {
-      flex: 1;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .camera-view video {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-
-    .camera-id-guide {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      width: 80%;
-      aspect-ratio: 85.6/54;
-      border: 2px solid rgba(245,158,11,0.7);
-      border-radius: 8px;
-      box-shadow: 0 0 0 9999px rgba(0,0,0,0.5);
-    }
-
-    .camera-id-guide .corner {
-      position: absolute;
-      width: 20px;
-      height: 20px;
-      border-color: var(--amber);
-      border-style: solid;
-    }
-
-    .camera-id-guide .corner.tl { top: -2px; left: -2px; border-width: 3px 0 0 3px; border-radius: 3px 0 0 0; }
-    .camera-id-guide .corner.tr { top: -2px; right: -2px; border-width: 3px 3px 0 0; border-radius: 0 3px 0 0; }
-    .camera-id-guide .corner.bl { bottom: -2px; left: -2px; border-width: 0 0 3px 3px; border-radius: 0 0 0 3px; }
-    .camera-id-guide .corner.br { bottom: -2px; right: -2px; border-width: 0 3px 3px 0; border-radius: 0 0 3px 0; }
-
-    .camera-guide-label {
-      position: absolute;
-      top: calc(50% - (80vw / 1.585) / 2 - 32px);
-      width: 100%;
-      text-align: center;
-      font-size: 12px;
-      color: rgba(255,255,255,0.7);
-      font-family: 'DM Mono', monospace;
-      letter-spacing: 0.08em;
-    }
-
-    .camera-controls {
-      padding: 24px 20px 36px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      background: #000;
-    }
-
-    .cam-btn-cancel {
-      background: none;
-      border: 1px solid rgba(255,255,255,0.2);
-      color: rgba(255,255,255,0.7);
-      border-radius: 50%;
-      width: 48px;
-      height: 48px;
-      font-size: 18px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .cam-btn-shoot {
-      width: 70px;
-      height: 70px;
-      border-radius: 50%;
-      background: #fff;
-      border: 4px solid rgba(255,255,255,0.3);
-      cursor: pointer;
-      position: relative;
-      flex-shrink: 0;
-    }
-
-    .cam-btn-shoot::after {
-      content: '';
-      position: absolute;
-      inset: 4px;
-      border-radius: 50%;
-      background: #fff;
-    }
-
-    .cam-btn-switch {
-      background: none;
-      border: 1px solid rgba(255,255,255,0.2);
-      color: rgba(255,255,255,0.7);
-      border-radius: 50%;
-      width: 48px;
-      height: 48px;
-      font-size: 18px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    canvas.cam-canvas { display: none; }
-
-    /* ── PHOTO INFO ROW ── */
-    .photo-info {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-      margin-top: 12px;
-    }
-
-    .photo-info-field {
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-    }
-
-    .photo-info-field label {
-      font-size: 10px;
-      text-transform: uppercase;
-      letter-spacing: 0.1em;
-      color: var(--slate);
-      font-family: 'DM Mono', monospace;
-    }
-
-    .photo-info-field input,
-    .photo-info-field select {
-      background: rgba(255,255,255,0.05);
-      border: 1px solid var(--border);
-      border-radius: 6px;
-      color: var(--white);
-      font-size: 13px;
-      padding: 8px 10px;
-      font-family: 'Inter', sans-serif;
-      outline: none;
-      transition: border-color 0.2s;
-      width: 100%;
-    }
-
-    .photo-info-field input:focus,
-    .photo-info-field select:focus {
-      border-color: var(--amber);
-    }
-
-    .photo-info-field select option { background: var(--navy); }
-
-    /* ── ACTION BUTTON ── */
-    .action-btn {
-      width: 100%;
-      padding: 14px;
-      border-radius: 8px;
-      font-size: 14px;
-      font-weight: 700;
-      letter-spacing: 0.04em;
-      text-transform: uppercase;
-      cursor: pointer;
-      border: none;
-      margin-top: 14px;
-      transition: opacity 0.2s, transform 0.1s;
-    }
-
-    .action-btn:active { transform: scale(0.98); }
-    .action-btn:disabled { opacity: 0.4; cursor: not-allowed; }
-
-    .action-btn.primary {
-      background: var(--amber);
-      color: var(--navy);
-    }
-
-    .action-btn.success {
-      background: var(--green);
-      color: #fff;
-    }
-
-    .action-btn.outline {
-      background: transparent;
-      border: 1px solid var(--amber);
-      color: var(--amber);
-    }
-
-    /* ── CHECKLIST ── */
-    .checklist {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      margin-top: 4px;
-    }
-
-    .check-item {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 10px 12px;
-      border-radius: 7px;
-      background: rgba(255,255,255,0.03);
-      border: 1px solid var(--border);
-      cursor: pointer;
-      transition: background 0.15s;
-      user-select: none;
-    }
-
-    .check-item:hover { background: rgba(255,255,255,0.05); }
-
-    .check-item.checked { background: rgba(34,197,94,0.06); border-color: rgba(34,197,94,0.2); }
-
-    .check-box {
-      width: 20px;
-      height: 20px;
-      border-radius: 5px;
-      border: 2px solid var(--slate);
-      flex-shrink: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 11px;
-      transition: background 0.15s, border-color 0.15s;
-    }
-
-    .check-item.checked .check-box {
-      background: var(--green);
-      border-color: var(--green);
-      color: #fff;
-    }
-
-    .check-text {
-      font-size: 13px;
-      color: var(--white);
-      flex: 1;
-    }
-
-    .check-item.checked .check-text {
-      color: var(--slate);
-      text-decoration: line-through;
-      text-decoration-color: rgba(148,163,184,0.4);
-    }
-
-    /* ── TRACKER MAP ── */
-    .tracker-map {
-      width: 100%;
-      aspect-ratio: 16/9;
-      border-radius: 8px;
-      background: #0D2137;
-      position: relative;
-      overflow: hidden;
-      border: 1px solid var(--border);
-    }
-
-    /* SVG road lines */
-    .map-svg {
-      width: 100%;
-      height: 100%;
-    }
-
-    /* Driver pin */
-    .driver-pin {
-      position: absolute;
-      width: 18px;
-      height: 18px;
-      transform: translate(-50%, -50%);
-      transition: left 3s cubic-bezier(0.4, 0, 0.2, 1), top 3s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-
-    .driver-pin::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      border-radius: 50%;
-      background: var(--amber);
-      z-index: 2;
-    }
-
-    .driver-pin::after {
-      content: '';
-      position: absolute;
-      inset: -6px;
-      border-radius: 50%;
-      background: rgba(245,158,11,0.25);
-      animation: pulse-ring 2s infinite;
-      z-index: 1;
-    }
-
-    @keyframes pulse-ring {
-      0%   { transform: scale(0.8); opacity: 1; }
-      100% { transform: scale(2);   opacity: 0; }
-    }
-
-    .destination-pin {
-      position: absolute;
-      transform: translate(-50%, -100%);
-      font-size: 22px;
-      filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
-      animation: bob 2.5s ease-in-out infinite;
-    }
-
-    @keyframes bob {
-      0%, 100% { transform: translate(-50%, -100%); }
-      50%       { transform: translate(-50%, calc(-100% - 6px)); }
-    }
-
-    .map-label {
-      position: absolute;
-      font-family: 'DM Mono', monospace;
-      font-size: 9px;
-      letter-spacing: 0.08em;
-      color: rgba(148,163,184,0.6);
-      text-transform: uppercase;
-    }
-
-    /* ── TRACKER STATS ── */
-    .tracker-stats {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 1px;
-      background: var(--border);
-      border-radius: 8px;
-      overflow: hidden;
-      margin-top: 12px;
-    }
-
-    .tracker-stat {
-      background: var(--card);
-      padding: 12px 10px;
-      display: flex;
-      flex-direction: column;
-      gap: 3px;
-      align-items: center;
-    }
-
-    .stat-val {
-      font-family: 'DM Mono', monospace;
-      font-size: 18px;
-      font-weight: 500;
-      color: var(--white);
-    }
-
-    .stat-key {
-      font-size: 9px;
-      text-transform: uppercase;
-      letter-spacing: 0.1em;
-      color: var(--slate);
-      font-family: 'DM Mono', monospace;
-    }
-
-    /* ── UPDATES FEED ── */
-    .updates-feed {
-      display: flex;
-      flex-direction: column;
-      gap: 0;
-      margin-top: 14px;
-    }
-
-    .update-entry {
-      display: flex;
-      gap: 12px;
-      padding: 10px 0;
-      border-bottom: 1px solid var(--border);
-      position: relative;
-    }
-
-    .update-entry:last-child { border-bottom: none; }
-
-    .update-time {
-      font-family: 'DM Mono', monospace;
-      font-size: 10px;
-      color: var(--slate);
-      width: 44px;
-      flex-shrink: 0;
-      padding-top: 2px;
-    }
-
-    .update-dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      background: var(--slate);
-      flex-shrink: 0;
-      margin-top: 5px;
-    }
-
-    .update-dot.amber { background: var(--amber); }
-    .update-dot.green { background: var(--green); }
-    .update-dot.blue  { background: #60A5FA; }
-
-    .update-text {
-      font-size: 13px;
-      color: var(--white);
-      line-height: 1.4;
-    }
-
-    .update-text small {
-      display: block;
-      font-size: 11px;
-      color: var(--slate);
-      margin-top: 2px;
-    }
-
-    /* ── STATUS BUTTONS ── */
-    .status-actions {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      margin-top: 14px;
-    }
-
-    .status-btn {
-      padding: 10px;
-      border-radius: 8px;
-      font-size: 12px;
-      font-weight: 600;
-      letter-spacing: 0.04em;
-      cursor: pointer;
-      border: 1px solid var(--border);
-      background: rgba(255,255,255,0.04);
-      color: var(--white);
-      transition: all 0.15s;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 4px;
-      flex: 1 1 calc(50% - 4px);
-      min-width: 0;
-    }
-
-    .status-btn:hover { background: rgba(255,255,255,0.08); }
-    .status-btn.active-amber { background: rgba(245,158,11,0.12); border-color: var(--amber); color: var(--amber); }
-    .status-btn.active-green { background: rgba(34,197,94,0.12);  border-color: var(--green);  color: var(--green); }
-    .status-btn.active-blue  { background: rgba(96,165,250,0.12); border-color: #60A5FA;       color: #60A5FA; }
-    .status-btn.active-red   { background: rgba(239,68,68,0.12);  border-color: var(--red);    color: var(--red); }
-
-    .status-btn-icon { font-size: 18px; }
-    .status-btn-label { font-size: 11px; }
-
-    /* ── SHARE LOCATION ── */
-    .location-share-row {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin-top: 12px;
-      padding: 10px 12px;
-      background: rgba(255,255,255,0.03);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-    }
-
-    .location-share-row .loc-icon {
-      font-size: 20px;
-    }
-
-    .location-share-row .loc-text {
-      flex: 1;
-    }
-
-    .location-share-row .loc-text strong {
-      font-size: 13px;
-      font-weight: 600;
-      color: var(--white);
-      display: block;
-    }
-
-    .location-share-row .loc-text small {
-      font-size: 11px;
-      color: var(--slate);
-      font-family: 'DM Mono', monospace;
-    }
-
-    .toggle-switch {
-      position: relative;
-      width: 44px;
-      height: 24px;
-      flex-shrink: 0;
-    }
-
-    .toggle-switch input { opacity: 0; width: 0; height: 0; }
-
-    .toggle-track {
-      position: absolute;
-      inset: 0;
-      border-radius: 12px;
-      background: rgba(255,255,255,0.1);
-      cursor: pointer;
-      transition: background 0.2s;
-    }
-
-    .toggle-track::after {
-      content: '';
-      position: absolute;
-      width: 18px;
-      height: 18px;
-      border-radius: 50%;
-      background: #fff;
-      top: 3px;
-      left: 3px;
-      transition: left 0.2s;
-    }
-
-    .toggle-switch input:checked + .toggle-track {
-      background: var(--green);
-    }
-
-    .toggle-switch input:checked + .toggle-track::after {
-      left: 23px;
-    }
-
-    /* ── TOAST ── */
-    .toast {
-      position: fixed;
-      bottom: 24px;
-      left: 50%;
-      transform: translateX(-50%) translateY(60px);
-      background: var(--navy2);
-      border: 1px solid var(--border);
-      color: var(--white);
-      padding: 12px 20px;
-      border-radius: 10px;
-      font-size: 13px;
-      font-weight: 600;
-      z-index: 300;
-      transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-      white-space: nowrap;
-      box-shadow: 0 8px 32px rgba(0,0,0,0.4);
-    }
-
-    .toast.show { transform: translateX(-50%) translateY(0); }
-    .toast.green-toast { border-color: rgba(34,197,94,0.4); }
-    .toast.amber-toast { border-color: rgba(245,158,11,0.4); }
-
-    /* ── STEP DIVIDER ── */
-    .step-divider {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin: 6px 0 2px;
-    }
-
-    .step-divider span {
-      font-size: 11px;
-      text-transform: uppercase;
-      letter-spacing: 0.1em;
-      color: var(--slate);
-      font-family: 'DM Mono', monospace;
-      white-space: nowrap;
-    }
-
-    .step-divider::before,
-    .step-divider::after {
-      content: '';
-      flex: 1;
-      height: 1px;
-      background: var(--border);
-    }
-
-    /* ── BOTTOM NAV ── */
-    .bottom-nav {
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      background: var(--navy);
-      border-top: 1px solid var(--border);
-      display: flex;
-      padding: 10px 0 env(safe-area-inset-bottom, 0);
-    }
-
-    .nav-item {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 3px;
-      padding: 6px 0;
-      cursor: pointer;
-      color: var(--slate);
-      transition: color 0.15s;
-      font-size: 10px;
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-      font-family: 'DM Mono', monospace;
-      border: none;
-      background: none;
-    }
-
-    .nav-item .nav-icon { font-size: 20px; }
-    .nav-item.active { color: var(--amber); }
-
-    @media (min-width: 480px) {
-      .app-main { padding: 24px 24px 40px; }
-    }
-
-    @media (prefers-reduced-motion: reduce) {
-      .status-dot, .driver-pin::after, .destination-pin { animation: none; }
-    }
-  </style>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
+<meta name="theme-color" content="#EFE9DC"/>
+<title>Aquatic Paradise — Field Dispatch</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=Manrope:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap"/>
+
+<style>
+  html, body, #root { height: 100%; margin: 0; }
+  body {
+    font-family: 'Manrope', system-ui, sans-serif;
+    background: #efe9dc;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    overflow: hidden;
+  }
+  * { -webkit-tap-highlight-color: transparent; }
+  button { font-family: inherit; }
+</style>
 </head>
 <body>
+  <div id="root"></div>
 
-<!-- TOP BAR -->
-<header class="topbar">
-  <div class="topbar-brand">
-    <div class="topbar-logo">🌊</div>
-    <div class="topbar-name">APR <span>Field</span></div>
-  </div>
-  <div class="topbar-status">
-    <span class="status-dot"></span>
-    <span id="clock">--:--</span>
-  </div>
-</header>
+  <script src="https://unpkg.com/react@18.3.1/umd/react.production.min.js" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" crossorigin="anonymous"></script>
 
-<!-- CAMERA OVERLAY (shared) -->
-<div class="camera-overlay" id="cameraOverlay">
-  <div class="camera-view">
-    <video id="camVideo" autoplay playsinline muted></video>
-    <canvas class="cam-canvas" id="camCanvas"></canvas>
-    <div class="camera-id-guide" id="camGuide">
-      <div class="corner tl"></div>
-      <div class="corner tr"></div>
-      <div class="corner bl"></div>
-      <div class="corner br"></div>
-    </div>
-    <div class="camera-guide-label" id="camGuideLabel">Align ID card within frame</div>
-  </div>
-  <div class="camera-controls">
-    <button class="cam-btn-cancel" id="camCancel" onclick="closeCamera()">✕</button>
-    <button class="cam-btn-shoot" id="camShoot" onclick="capturePhoto()"></button>
-    <button class="cam-btn-switch" id="camSwitch" onclick="switchCamera()">🔄</button>
-  </div>
-</div>
+  <script type="text/babel">
+// theme.jsx — Aquatic Paradise field app
+// Two editorial themes: Linen (day) + Midnight (night).
+// Brand mark is the existing logo (teal #1F8FA0 + warm yellow sun + coral board).
 
-<!-- MAIN APP -->
-<main class="app-main" id="appMain">
-
-  <!-- ORDER BANNER -->
-  <div class="order-banner">
-    <div class="order-label">Active Delivery</div>
-    <div class="order-id" id="orderId">APR-20260616-001</div>
-    <div class="order-meta">
-      <div class="order-meta-item">
-        <span class="meta-key">Customer</span>
-        <span class="meta-val" id="customerName">—</span>
-      </div>
-      <div class="order-meta-item">
-        <span class="meta-key">Gear</span>
-        <span class="meta-val" id="gearType">—</span>
-      </div>
-      <div class="order-meta-item">
-        <span class="meta-key">Pickup Time</span>
-        <span class="meta-val" id="pickupTime">—</span>
-      </div>
-      <div class="order-meta-item">
-        <span class="meta-key">Location</span>
-        <span class="meta-val" id="deliveryLoc">—</span>
-      </div>
-    </div>
-  </div>
-
-  <!-- ─── CARD 1: IDENTIFICATION ─── -->
-  <div class="field-card">
-    <div class="card-header">
-      <div class="card-icon amber">🪪</div>
-      <div>
-        <div class="card-title">ID Verification</div>
-        <div class="card-subtitle">Photograph customer's government-issued ID</div>
-      </div>
-      <span class="card-badge badge-pending" id="idBadge">Pending</span>
-    </div>
-    <div class="card-body">
-
-      <div class="step-divider"><span>Step 1 — Front of ID</span></div>
-
-      <!-- ID Front slot -->
-      <div class="photo-slot" id="idFrontSlot" onclick="openCamera('id-front')">
-        <div class="id-frame-guide"></div>
-        <div class="slot-placeholder" id="idFrontPlaceholder">
-          <div class="slot-icon">📷</div>
-          <span class="slot-label">Tap to photograph</span>
-          <span class="slot-hint">Passport · Driver's licence · National ID</span>
-        </div>
-        <img class="captured" id="idFrontImg" style="display:none" alt="ID front" />
-        <div class="photo-overlay">
-          <span class="photo-retake" onclick="event.stopPropagation(); openCamera('id-front')">Retake</span>
-        </div>
-      </div>
-
-      <div class="step-divider" style="margin-top:14px"><span>Step 2 — Back of ID (optional)</span></div>
-
-      <!-- ID Back slot -->
-      <div class="photo-slot" id="idBackSlot" onclick="openCamera('id-back')" style="margin-top:0">
-        <div class="id-frame-guide"></div>
-        <div class="slot-placeholder" id="idBackPlaceholder">
-          <div class="slot-icon">📷</div>
-          <span class="slot-label">Back of ID</span>
-          <span class="slot-hint">Skip if front-only document</span>
-        </div>
-        <img class="captured" id="idBackImg" style="display:none" alt="ID back" />
-        <div class="photo-overlay">
-          <span class="photo-retake" onclick="event.stopPropagation(); openCamera('id-back')">Retake</span>
-        </div>
-      </div>
-
-      <!-- ID metadata -->
-      <div class="photo-info">
-        <div class="photo-info-field">
-          <label>ID Type</label>
-          <select id="idType">
-            <option value="">Select...</option>
-            <option>Passport</option>
-            <option>Driver's Licence</option>
-            <option>National ID</option>
-            <option>Voter Card</option>
-          </select>
-        </div>
-        <div class="photo-info-field">
-          <label>ID Number</label>
-          <input type="text" id="idNumber" placeholder="Last 4 digits" maxlength="4" />
-        </div>
-        <div class="photo-info-field">
-          <label>Name on ID</label>
-          <input type="text" id="idName" placeholder="Full name" />
-        </div>
-        <div class="photo-info-field">
-          <label>Expiry</label>
-          <input type="month" id="idExpiry" />
-        </div>
-      </div>
-
-      <button class="action-btn primary" id="idConfirmBtn" onclick="confirmId()" disabled>
-        Confirm ID Verification
-      </button>
-
-    </div>
-  </div>
-
-  <!-- ─── CARD 2: DELIVERY PHOTO ─── -->
-  <div class="field-card">
-    <div class="card-header">
-      <div class="card-icon blue">📦</div>
-      <div>
-        <div class="card-title">Delivery Pickup Photo</div>
-        <div class="card-subtitle">Document the handoff — gear condition &amp; customer</div>
-      </div>
-      <span class="card-badge badge-pending" id="deliveryBadge">Pending</span>
-    </div>
-    <div class="card-body">
-
-      <!-- Gear condition checklist -->
-      <div class="step-divider"><span>Gear Condition Checklist</span></div>
-
-      <div class="checklist">
-        <div class="check-item" id="chk-board" onclick="toggleCheck('chk-board')">
-          <div class="check-box">✓</div>
-          <span class="check-text">Board / Kayak — no visible damage</span>
-        </div>
-        <div class="check-item" id="chk-paddle" onclick="toggleCheck('chk-paddle')">
-          <div class="check-box">✓</div>
-          <span class="check-text">Paddle / oar — intact, no cracks</span>
-        </div>
-        <div class="check-item" id="chk-pfd" onclick="toggleCheck('chk-pfd')">
-          <div class="check-box">✓</div>
-          <span class="check-text">Life vest / PFD — buckles working</span>
-        </div>
-        <div class="check-item" id="chk-leash" onclick="toggleCheck('chk-leash')">
-          <div class="check-box">✓</div>
-          <span class="check-text">Leash / cord — no fraying</span>
-        </div>
-        <div class="check-item" id="chk-extras" onclick="toggleCheck('chk-extras')">
-          <div class="check-box">✓</div>
-          <span class="check-text">Extras (fins, pump, snorkel kit) — complete</span>
-        </div>
-      </div>
-
-      <div class="step-divider" style="margin-top:16px"><span>Handoff Photo</span></div>
-
-      <!-- Delivery photo slot -->
-      <div class="photo-slot" id="deliverySlot" onclick="openCamera('delivery')" style="aspect-ratio:4/3">
-        <div class="slot-placeholder" id="deliveryPlaceholder">
-          <div class="slot-icon">📷</div>
-          <span class="slot-label">Photo with customer &amp; gear</span>
-          <span class="slot-hint">Both customer and equipment in frame</span>
-        </div>
-        <img class="captured" id="deliveryImg" style="display:none" alt="Delivery handoff" />
-        <div class="photo-overlay">
-          <span class="photo-retake" onclick="event.stopPropagation(); openCamera('delivery')">Retake</span>
-        </div>
-      </div>
-
-      <!-- Delivery notes -->
-      <div class="photo-info" style="grid-template-columns:1fr;">
-        <div class="photo-info-field">
-          <label>Delivery Notes</label>
-          <input type="text" id="deliveryNotes" placeholder="e.g. Left at beach entrance, gate code 1234" />
-        </div>
-      </div>
-
-      <button class="action-btn success" id="deliveryConfirmBtn" onclick="confirmDelivery()" disabled>
-        Confirm Handoff &amp; Timestamp
-      </button>
-
-    </div>
-  </div>
-
-  <!-- ─── CARD 3: DRIVER TRACKER ─── -->
-  <div class="field-card">
-    <div class="card-header">
-      <div class="card-icon green">🛺</div>
-      <div>
-        <div class="card-title">Driver Tracker</div>
-        <div class="card-subtitle">Live location &amp; status updates</div>
-      </div>
-      <span class="card-badge badge-live" id="trackerBadge">Live</span>
-    </div>
-    <div class="card-body">
-
-      <!-- Map -->
-      <div class="tracker-map" id="trackerMap">
-        <svg class="map-svg" viewBox="0 0 400 225" xmlns="http://www.w3.org/2000/svg">
-          <!-- Water background -->
-          <rect width="400" height="225" fill="#0D2137" />
-          <!-- Land masses -->
-          <ellipse cx="200" cy="120" rx="180" ry="90" fill="#0F2E1A" opacity="0.6" />
-          <!-- Roads -->
-          <path d="M20 180 Q100 120 200 100 Q300 80 380 60" stroke="#1E3A5F" stroke-width="10" fill="none" />
-          <path d="M60 210 Q120 160 180 130 Q240 100 280 80" stroke="#1A3254" stroke-width="6" fill="none" />
-          <path d="M200 100 L200 225" stroke="#1E3A5F" stroke-width="8" fill="none" />
-          <!-- Dotted center lines -->
-          <path d="M20 180 Q100 120 200 100 Q300 80 380 60" stroke="#2A4A6E" stroke-width="1.5" fill="none" stroke-dasharray="6 8" />
-          <!-- Beach/shore accent -->
-          <path d="M40 200 Q120 170 200 160 Q280 150 360 140" stroke="#1D4A2E" stroke-width="3" fill="none" opacity="0.4" />
-          <!-- Location labels -->
-          <text x="28" y="195" fill="#2A4A6E" font-size="7" font-family="monospace" letter-spacing="1">PORT ELIZABETH</text>
-          <text x="260" y="72" fill="#2A4A6E" font-size="7" font-family="monospace" letter-spacing="1">INDUSTRY BAY</text>
-          <text x="160" y="148" fill="#2A4A6E" font-size="7" font-family="monospace" letter-spacing="1">FRIENDSHIP BAY</text>
-        </svg>
-        <!-- Driver pin -->
-        <div class="driver-pin" id="driverPin" style="left:30%;top:72%"></div>
-        <!-- Destination pin -->
-        <div class="destination-pin" id="destPin" style="left:70%;top:35%">📍</div>
-        <!-- Labels -->
-        <div class="map-label" style="top:6px;left:8px;background:rgba(11,30,61,0.8);padding:3px 6px;border-radius:4px;">
-          🛺 Driver
-        </div>
-        <div class="map-label" style="top:6px;right:8px;background:rgba(11,30,61,0.8);padding:3px 6px;border-radius:4px;">
-          📍 Drop-off
-        </div>
-      </div>
-
-      <!-- Stats row -->
-      <div class="tracker-stats">
-        <div class="tracker-stat">
-          <span class="stat-val" id="etaVal">—</span>
-          <span class="stat-key">ETA (min)</span>
-        </div>
-        <div class="tracker-stat">
-          <span class="stat-val" id="distVal">—</span>
-          <span class="stat-key">Distance</span>
-        </div>
-        <div class="tracker-stat">
-          <span class="stat-val" id="speedVal">—</span>
-          <span class="stat-key">Speed</span>
-        </div>
-      </div>
-
-      <!-- Location sharing toggle -->
-      <div class="location-share-row">
-        <span class="loc-icon">📡</span>
-        <div class="loc-text">
-          <strong>Share My Location</strong>
-          <small id="locCoords">Tap toggle to enable GPS</small>
-        </div>
-        <label class="toggle-switch">
-          <input type="checkbox" id="locationToggle" onchange="toggleLocation(this)" />
-          <span class="toggle-track"></span>
-        </label>
-      </div>
-
-      <!-- Status update buttons -->
-      <div class="step-divider" style="margin-top:14px"><span>Post Status Update</span></div>
-
-      <div class="status-actions">
-        <button class="status-btn" id="btn-enroute" onclick="postStatus('enroute')">
-          <span class="status-btn-icon">🛺</span>
-          <span class="status-btn-label">En Route</span>
-        </button>
-        <button class="status-btn" id="btn-arrived" onclick="postStatus('arrived')">
-          <span class="status-btn-icon">📍</span>
-          <span class="status-btn-label">Arrived</span>
-        </button>
-        <button class="status-btn" id="btn-delivered" onclick="postStatus('delivered')">
-          <span class="status-btn-icon">✅</span>
-          <span class="status-btn-label">Delivered</span>
-        </button>
-        <button class="status-btn" id="btn-issue" onclick="postStatus('issue')">
-          <span class="status-btn-icon">⚠️</span>
-          <span class="status-btn-label">Report Issue</span>
-        </button>
-      </div>
-
-      <!-- Updates feed -->
-      <div class="step-divider" style="margin-top:14px"><span>Activity Log</span></div>
-
-      <div class="updates-feed" id="updatesFeed">
-        <!-- Populated by JS -->
-      </div>
-
-    </div>
-  </div>
-
-</main>
-
-<!-- BOTTOM NAV -->
-<nav class="bottom-nav">
-  <button class="nav-item active">
-    <span class="nav-icon">📋</span>Order
-  </button>
-  <button class="nav-item">
-    <span class="nav-icon">📷</span>Photos
-  </button>
-  <button class="nav-item">
-    <span class="nav-icon">🗺️</span>Map
-  </button>
-  <button class="nav-item">
-    <span class="nav-icon">💬</span>Chat
-  </button>
-</nav>
-
-<!-- TOAST -->
-<div class="toast" id="toast"></div>
-
-<script>
-/* ── CLOCK ── */
-function updateClock() {
-  const now = new Date();
-  document.getElementById('clock').textContent =
-    now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false });
-}
-updateClock();
-setInterval(updateClock, 15000);
-
-/* ── ORDER INIT ── */
-(function initOrder() {
-  const params = new URLSearchParams(location.search);
-  document.getElementById('orderId').textContent =
-    params.get('order') || 'APR-' + new Date().toISOString().slice(0,10).replace(/-/g,'') + '-001';
-  document.getElementById('customerName').textContent = params.get('name') || 'Walk-in';
-  document.getElementById('gearType').textContent = params.get('gear') || '1× SUP Board';
-  document.getElementById('pickupTime').textContent = params.get('time') || '10:00 AM';
-  document.getElementById('deliveryLoc').textContent = params.get('loc') || 'Friendship Bay';
-})();
-
-/* ── CAMERA ── */
-let stream = null;
-let activeSlot = null;
-let facingMode = 'environment';
-
-function openCamera(slot) {
-  activeSlot = slot;
-  const isId = slot.startsWith('id');
-  document.getElementById('camGuide').style.display = isId ? 'block' : 'none';
-  document.getElementById('camGuideLabel').textContent = isId
-    ? 'Align ID card within frame'
-    : 'Frame gear + customer clearly';
-
-  navigator.mediaDevices.getUserMedia({ video: { facingMode }, audio: false })
-    .then(s => {
-      stream = s;
-      const v = document.getElementById('camVideo');
-      v.srcObject = s;
-      document.getElementById('cameraOverlay').classList.add('active');
-    })
-    .catch(() => {
-      // Fallback: open file picker
-      const inp = document.createElement('input');
-      inp.type = 'file';
-      inp.accept = 'image/*';
-      inp.capture = 'environment';
-      inp.onchange = e => {
-        const file = e.target.files[0];
-        if (!file) return;
-        const reader = new FileReader();
-        reader.onload = ev => applyPhoto(ev.target.result);
-        reader.readAsDataURL(file);
-      };
-      inp.click();
-    });
-}
-
-function closeCamera() {
-  if (stream) { stream.getTracks().forEach(t => t.stop()); stream = null; }
-  document.getElementById('cameraOverlay').classList.remove('active');
-  activeSlot = null;
-}
-
-function capturePhoto() {
-  const video = document.getElementById('camVideo');
-  const canvas = document.getElementById('camCanvas');
-  canvas.width = video.videoWidth;
-  canvas.height = video.videoHeight;
-  canvas.getContext('2d').drawImage(video, 0, 0);
-  const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
-  applyPhoto(dataUrl);
-  closeCamera();
-}
-
-function switchCamera() {
-  facingMode = facingMode === 'environment' ? 'user' : 'environment';
-  if (stream) { stream.getTracks().forEach(t => t.stop()); }
-  navigator.mediaDevices.getUserMedia({ video: { facingMode }, audio: false })
-    .then(s => { stream = s; document.getElementById('camVideo').srcObject = s; })
-    .catch(() => {});
-}
-
-function applyPhoto(dataUrl) {
-  if (!activeSlot) return;
-  if (activeSlot === 'id-front') {
-    const img = document.getElementById('idFrontImg');
-    img.src = dataUrl; img.style.display = 'block';
-    document.getElementById('idFrontPlaceholder').style.display = 'none';
-    document.getElementById('idFrontSlot').classList.add('has-image');
-  } else if (activeSlot === 'id-back') {
-    const img = document.getElementById('idBackImg');
-    img.src = dataUrl; img.style.display = 'block';
-    document.getElementById('idBackPlaceholder').style.display = 'none';
-    document.getElementById('idBackSlot').classList.add('has-image');
-  } else if (activeSlot === 'delivery') {
-    const img = document.getElementById('deliveryImg');
-    img.src = dataUrl; img.style.display = 'block';
-    document.getElementById('deliveryPlaceholder').style.display = 'none';
-    document.getElementById('deliverySlot').classList.add('has-image');
-  }
-  checkIdReady();
-  checkDeliveryReady();
-}
-
-/* ── ID VERIFICATION ── */
-function checkIdReady() {
-  const hasFront = document.getElementById('idFrontSlot').classList.contains('has-image');
-  document.getElementById('idConfirmBtn').disabled = !hasFront;
-}
-
-function confirmId() {
-  const badge = document.getElementById('idBadge');
-  badge.textContent = 'Verified';
-  badge.className = 'card-badge badge-done';
-  showToast('✅ ID captured and saved', 'green');
-  addUpdate('ID verified', 'Customer ID photographed and logged.', 'green');
-}
-
-/* ── CHECKLIST ── */
-function toggleCheck(id) {
-  document.getElementById(id).classList.toggle('checked');
-  checkDeliveryReady();
-}
-
-function checkDeliveryReady() {
-  const hasPhoto = document.getElementById('deliverySlot').classList.contains('has-image');
-  document.getElementById('deliveryConfirmBtn').disabled = !hasPhoto;
-}
-
-function confirmDelivery() {
-  const badge = document.getElementById('deliveryBadge');
-  badge.textContent = 'Complete';
-  badge.className = 'card-badge badge-done';
-  const ts = new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
-  showToast('📦 Handoff confirmed at ' + ts, 'green');
-  addUpdate('Handoff complete', 'Gear delivered and photographed. ' + ts, 'green');
-  postStatus('delivered');
-}
-
-/* ── TRACKER ── */
-let watchId = null;
-const driverPin = document.getElementById('driverPin');
-
-// Animated driver movement demo
-const demoPath = [
-  { left: '30%', top: '72%' },
-  { left: '38%', top: '65%' },
-  { left: '46%', top: '58%' },
-  { left: '55%', top: '50%' },
-  { left: '63%', top: '42%' },
-  { left: '70%', top: '35%' },
-];
-let demoStep = 0;
-
-function startDemoMovement() {
-  setInterval(() => {
-    if (demoStep < demoPath.length) {
-      const p = demoPath[demoStep];
-      driverPin.style.left = p.left;
-      driverPin.style.top = p.top;
-      // Update ETA
-      const remaining = demoPath.length - demoStep;
-      document.getElementById('etaVal').textContent = Math.max(1, remaining * 2);
-      document.getElementById('distVal').textContent = (remaining * 0.3).toFixed(1) + 'km';
-      document.getElementById('speedVal').textContent = (15 + Math.random() * 10).toFixed(0) + 'km/h';
-      demoStep++;
-    }
-  }, 3000);
-}
-startDemoMovement();
-
-function toggleLocation(el) {
-  if (el.checked) {
-    if (!navigator.geolocation) {
-      document.getElementById('locCoords').textContent = 'GPS not available';
-      el.checked = false;
-      return;
-    }
-    watchId = navigator.geolocation.watchPosition(pos => {
-      const { latitude: lat, longitude: lng } = pos.coords;
-      document.getElementById('locCoords').textContent =
-        lat.toFixed(5) + ', ' + lng.toFixed(5);
-      addUpdate('Location shared', 'GPS: ' + lat.toFixed(4) + ', ' + lng.toFixed(4), 'blue');
-    }, () => {
-      document.getElementById('locCoords').textContent = 'Permission denied';
-      el.checked = false;
-    }, { enableHighAccuracy: true });
-    showToast('📡 Live location sharing on', 'green');
-  } else {
-    if (watchId !== null) { navigator.geolocation.clearWatch(watchId); watchId = null; }
-    document.getElementById('locCoords').textContent = 'Location sharing off';
-    showToast('📡 Location sharing off', '');
-  }
-}
-
-const statusConfig = {
-  enroute:   { label: 'En Route to Customer', color: 'amber', btnId: 'btn-enroute', cls: 'active-amber' },
-  arrived:   { label: 'Arrived at Location',  color: 'blue',  btnId: 'btn-arrived', cls: 'active-blue' },
-  delivered: { label: 'Order Delivered',       color: 'green', btnId: 'btn-delivered', cls: 'active-green' },
-  issue:     { label: 'Issue Reported',        color: 'red',   btnId: 'btn-issue', cls: 'active-red' },
+const themes = {
+  linen: {
+    name: "Linen",
+    mode: "Day Dispatch",
+    bg: "#EFE9DC",              // warm linen canvas
+    paper: "#FBF7EE",           // card paper
+    paperWarm: "#F4EDDD",       // tinted card
+    ink: "#1B1A16",
+    inkSoft: "rgba(27,26,22,0.62)",
+    inkFaint: "rgba(27,26,22,0.36)",
+    rule: "rgba(27,26,22,0.10)",
+    ruleStrong: "rgba(27,26,22,0.22)",
+    sea: "#2C5A60",             // deep sea-foam
+    seaSoft: "#9CB9B7",
+    brand: "#1F8FA0",           // logo teal
+    gold: "#B58452",            // warm bronze
+    coral: "#C56A4F",           // logo coral
+    sun: "#E6B450",
+    success: "#436B3B",
+    warn: "#9C5A23",
+    danger: "#A1392C",
+    chrome: "rgba(255,255,255,0.65)",
+    chromeBorder: "rgba(27,26,22,0.10)",
+    deviceFrame: "#2A2520",
+    chartLand: "#E5D9BE",
+    chartWater: "#D9CFB7",
+    chartContour: "rgba(43,38,28,0.22)",
+  },
+  midnight: {
+    name: "Midnight",
+    mode: "Sunset Shift",
+    bg: "#0E1A1D",
+    paper: "#152428",
+    paperWarm: "#1B2E33",
+    ink: "#ECE6D9",
+    inkSoft: "rgba(236,230,217,0.62)",
+    inkFaint: "rgba(236,230,217,0.32)",
+    rule: "rgba(236,230,217,0.10)",
+    ruleStrong: "rgba(236,230,217,0.22)",
+    sea: "#7CC3C9",
+    seaSoft: "#43706F",
+    brand: "#2BB5C3",
+    gold: "#D4A85B",
+    coral: "#D88062",
+    sun: "#E6B450",
+    success: "#7CB36A",
+    warn: "#D9A35B",
+    danger: "#D86D5C",
+    chrome: "rgba(20,32,36,0.65)",
+    chromeBorder: "rgba(236,230,217,0.10)",
+    deviceFrame: "#06100F",
+    chartLand: "#1C2E2C",
+    chartWater: "#0F1F23",
+    chartContour: "rgba(124,195,201,0.18)",
+  },
 };
 
-let lastStatus = null;
+const tFont = {
+  display: "'Cormorant Garamond', 'EB Garamond', Georgia, serif",
+  ui: "'Manrope', 'Söhne', system-ui, sans-serif",
+  mono: "'JetBrains Mono', ui-monospace, Menlo, monospace",
+};
 
-function postStatus(type) {
-  const cfg = statusConfig[type];
-  if (!cfg) return;
-  // Reset all buttons
-  Object.values(statusConfig).forEach(c => {
-    const btn = document.getElementById(c.btnId);
-    btn.className = 'status-btn';
-  });
-  // Activate chosen
-  document.getElementById(cfg.btnId).classList.add(cfg.cls);
-  lastStatus = type;
-  addUpdate(cfg.label, 'Status posted to booking log.', cfg.color);
-  showToast('Status: ' + cfg.label, cfg.color === 'green' ? 'green' : 'amber');
+// Fixture data ────────────────────────────────────────────────────────────
+const todayDispatches = [
+  {
+    id: "APR-2026-0142",
+    when: "09:00 – 13:00",
+    timeShort: "09:00",
+    duration: "4h",
+    guest: "Margaux & Henri Bernier",
+    party: 2,
+    whatsapp: "+33 6 14 22 89 04",
+    location: "Princess Margaret Beach",
+    addr: "North palm grove, 30m from Jack's",
+    note: "Honeymoon — please leave water bottles + welcome card.",
+    items: [
+      { code: "PB-01", label: "Paddle Board — Yellow #1", type: "paddleboard" },
+      { code: "PB-02", label: "Paddle Board — Yellow #2", type: "paddleboard" },
+      { code: "SN-01", label: "Snorkel Kit #1", type: "snorkel" },
+    ],
+    payment: "Online — paid",
+    total: 270,
+    status: "ready",
+    pin: { x: 240, y: 250 },
+  },
+  {
+    id: "APR-2026-0143",
+    when: "10:30 – 12:30",
+    timeShort: "10:30",
+    duration: "2h",
+    guest: "Tana Whitfield",
+    party: 1,
+    whatsapp: "+1 246 822 0014",
+    location: "Lower Bay",
+    addr: "South end, blue umbrella row",
+    note: "Repeat guest. Allergic to neoprene — provide fabric PFD.",
+    items: [
+      { code: "KY-02", label: "Kayak — Double", type: "kayak" },
+      { code: "BS-01", label: "Beach Setup #1", type: "beach" },
+    ],
+    payment: "Cash on delivery",
+    total: 170,
+    status: "enroute",
+    pin: { x: 188, y: 340 },
+  },
+  {
+    id: "APR-2026-0144",
+    when: "11:00 – 15:00",
+    timeShort: "11:00",
+    duration: "4h",
+    guest: "S/V Aletheia (Capt. Olivier)",
+    party: 4,
+    whatsapp: "+1 784 555 0188",
+    location: "Anchorage — Mooring 14",
+    addr: "Tender to port stern, white hull, blue trim",
+    note: "Charter yacht. Drop at swim ladder, return pickup 15:00.",
+    items: [
+      { code: "PB-03", label: "Paddle Board — Yellow #3", type: "paddleboard" },
+      { code: "FL-01", label: "Float Set #1", type: "float" },
+      { code: "FL-02", label: "Float Set #2", type: "float" },
+      { code: "SN-02", label: "Snorkel Kit #2", type: "snorkel" },
+    ],
+    payment: "Resort comp — Bequia Beach Hotel",
+    total: 380,
+    status: "scheduled",
+    pin: { x: 96, y: 200 },
+  },
+  {
+    id: "APR-2026-0145",
+    when: "14:00 – 18:00",
+    timeShort: "14:00",
+    duration: "4h",
+    guest: "Rashida Forbes +3",
+    party: 4,
+    whatsapp: "+1 784 433 9912",
+    location: "Princess Margaret Beach",
+    addr: "Central, near lifeguard stand",
+    note: "Birthday group. Two non-swimmers — extra PFD demo.",
+    items: [
+      { code: "KY-01", label: "Kayak — Single", type: "kayak" },
+      { code: "BS-01", label: "Beach Setup #1", type: "beach" },
+    ],
+    payment: "Online — paid",
+    total: 220,
+    status: "scheduled",
+    pin: { x: 232, y: 268 },
+  },
+];
+
+const fleet = [
+  { code: "PB-01", label: "FunWater Horizon 11′ — Yellow #1", type: "paddleboard", status: "out", with: "APR-0142" },
+  { code: "PB-02", label: "FunWater Horizon 11′ — Yellow #2", type: "paddleboard", status: "out", with: "APR-0142" },
+  { code: "PB-03", label: "FunWater Horizon 11′ — Yellow #3", type: "paddleboard", status: "ready" },
+  { code: "KY-01", label: "Kayak — Single", type: "kayak", status: "ready" },
+  { code: "KY-02", label: "Kayak — Double", type: "kayak", status: "ready" },
+  { code: "SN-01", label: "Snorkel Kit #1", type: "snorkel", status: "out", with: "APR-0142" },
+  { code: "SN-02", label: "Snorkel Kit #2", type: "snorkel", status: "ready" },
+  { code: "FL-01", label: "Float Set #1", type: "float", status: "service", note: "Patch — back tomorrow" },
+  { code: "FL-02", label: "Float Set #2", type: "float", status: "ready" },
+  { code: "BS-01", label: "Beach Setup #1 — umbrella + 2 loungers", type: "beach", status: "ready" },
+];
+
+const pricing = [
+  { item: "Paddle Board", h1: 25, h2: 50, h4: 100, full: 150 },
+  { item: "Kayak", h1: 20, h2: 40, h4: 80, full: 120 },
+  { item: "Snorkel Kit", h1: 15, h2: 30, h4: 60, full: 90 },
+  { item: "Floater", h1: 10, h2: 20, h4: 40, full: 70 },
+  { item: "Beach Setup", h1: "—", h2: "—", h4: "—", full: 50 },
+];
+
+const gearImages = {
+  "PB-01": "assets/gear/paddleboard-turtle.jpg",
+  "PB-02": "assets/gear/paddleboard-tiki.jpg",
+  "PB-03": "assets/gear/paddleboard-sage.jpg",
+  "KY-01": "assets/gear/kayak.jpg",
+  "KY-02": "assets/gear/kayak.jpg",
+  "SN-01": "assets/gear/snorkel.jpg",
+  "SN-02": "assets/gear/snorkel.jpg",
+  "FL-01": "assets/gear/float-lounge.jpg",
+  "FL-02": "assets/gear/float-tube.jpg",
+  "BS-01": null,
+  paddleboard: "assets/gear/paddleboard-blue.jpg",
+  kayak:       "assets/gear/kayak.jpg",
+  snorkel:     "assets/gear/snorkel.jpg",
+  float:       "assets/gear/float-tube.jpg",
+  beach:       null,
+};
+
+window.APR_THEMES = themes;
+window.APR_FONTS = tFont;
+window.APR_DATA = { todayDispatches, fleet, pricing };
+window.APR_GEAR_IMAGES = gearImages;
+
+  </script>
+
+  <script type="text/babel">
+// components.jsx — shared building blocks for the field app
+// Icons (line, editorial), Phone shell (slimmer than full iOS frame),
+// Admiralty Bay map (stylized chart), Signature pad, Gear glyphs.
+
+const { useState, useRef, useEffect, useMemo } = React;
+
+// ── Icons (1.5px stroke, editorial) ──────────────────────────────────────
+function I(props) {
+  const { d, size = 18, fill = "none", stroke = "currentColor", sw = 1.5, children } = props;
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill={fill}
+      stroke={stroke} strokeWidth={sw} strokeLinecap="round" strokeLinejoin="round"
+      style={{ flexShrink: 0 }}>
+      {d ? <path d={d}/> : children}
+    </svg>
+  );
+}
+const Icons = {
+  arrowR: (p) => <I {...p} d="M5 12h14M13 5l7 7-7 7"/>,
+  arrowL: (p) => <I {...p} d="M19 12H5M11 5l-7 7 7 7"/>,
+  check:  (p) => <I {...p} d="M4 12.5l5 5L20 6.5"/>,
+  x:      (p) => <I {...p} d="M6 6l12 12M18 6L6 18"/>,
+  qr:     (p) => <I {...p}><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><path d="M14 14h3v3M21 14v3M14 18v3h3M21 21v-3"/></I>,
+  pin:    (p) => <I {...p}><path d="M12 22s-7-7.5-7-13a7 7 0 1 1 14 0c0 5.5-7 13-7 13z"/><circle cx="12" cy="9" r="2.5"/></I>,
+  phone:  (p) => <I {...p} d="M22 17v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.2 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2 4.2 2 2 0 0 1 4 2h3a2 2 0 0 1 2 1.7 12.8 12.8 0 0 0 .7 2.8 2 2 0 0 1-.5 2.1L8 10a16 16 0 0 0 6 6l1.4-1.2a2 2 0 0 1 2.1-.5 12.8 12.8 0 0 0 2.8.7A2 2 0 0 1 22 17z"/>,
+  whatsapp: (p) => <I {...p}><path d="M3 21l1.7-5.1A8.5 8.5 0 1 1 8.1 19.3L3 21z"/><path d="M9 9c0 4 2.5 6 5.5 6.5.4-.1 1.5-.7 1.8-1.4.3-.6-.4-1-1.3-1.4-.6-.3-1-.4-1.3 0-.3.4-.7.8-1.1.6C11.7 13 10 11.3 9.7 10.5c-.2-.4.2-.8.6-1.1.4-.3.3-.7 0-1.3-.4-.9-.8-1.6-1.4-1.3C8.2 7 7.6 8 7.6 8.4"/></I>,
+  camera: (p) => <I {...p}><path d="M3 7h3l2-2h8l2 2h3a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V8a1 1 0 0 1 1-1z"/><circle cx="12" cy="13" r="4"/></I>,
+  signature: (p) => <I {...p} d="M3 17s2-7 5-7 3 6 6 6 4-9 7-9M3 21h18"/>,
+  clipboard: (p) => <I {...p}><rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4V2.5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1V4M9 11h6M9 15h4"/></I>,
+  bell:   (p) => <I {...p} d="M18 16V11a6 6 0 1 0-12 0v5l-2 3h16l-2-3zM9.5 20a2.5 2.5 0 0 0 5 0"/>,
+  user:   (p) => <I {...p}><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></I>,
+  clock:  (p) => <I {...p}><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></I>,
+  list:   (p) => <I {...p} d="M8 6h13M8 12h13M8 18h13M3.5 6h.01M3.5 12h.01M3.5 18h.01"/>,
+  ship:   (p) => <I {...p}><path d="M2 18l1.5-3.5L12 16l8.5-1.5L22 18M5 14l1-7h12l1 7M9 7V4h6v3"/><path d="M5 21a3 3 0 0 0 2.5-1.5 3 3 0 0 0 5 0 3 3 0 0 0 5 0 3 3 0 0 0 2.5 1.5"/></I>,
+  sun:    (p) => <I {...p}><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></I>,
+  moon:   (p) => <I {...p} d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/>,
+  send:   (p) => <I {...p} d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/>,
+  alert:  (p) => <I {...p}><path d="M12 9v4M12 17h.01"/><path d="M10.3 3.9L1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/></I>,
+  more:   (p) => <I {...p}><circle cx="5" cy="12" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/></I>,
+  refresh:(p) => <I {...p} d="M3 12a9 9 0 0 1 15-6.7L21 8M21 3v5h-5M21 12a9 9 0 0 1-15 6.7L3 16M3 21v-5h5"/>,
+};
+
+// ── Gear glyphs (stylized SVG for fleet items) ───────────────────────────
+function GearGlyph({ type, color = "currentColor", size = 22 }) {
+  const s = { width: size, height: size, flexShrink: 0 };
+  switch (type) {
+    case "paddleboard":
+      return <svg style={s} viewBox="0 0 32 32" fill="none" stroke={color} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+        <ellipse cx="16" cy="16" rx="4" ry="13.5"/>
+        <path d="M16 8v16M22 2v28M21 4l2-2M23 28l-2 2"/>
+      </svg>;
+    case "kayak":
+      return <svg style={s} viewBox="0 0 32 32" fill="none" stroke={color} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M3 16c4 6 22 6 26 0M3 16c4-6 22-6 26 0M11 16v2M21 16v2"/>
+        <path d="M8 6l4 6M24 26l-4-6"/>
+      </svg>;
+    case "snorkel":
+      return <svg style={s} viewBox="0 0 32 32" fill="none" stroke={color} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M6 14c0-3 4-5 10-5s10 2 10 5v3c0 2-3 3-6 3h-1l-3 3-3-3h-1c-3 0-6-1-6-3v-3z"/>
+        <path d="M22 14V6M22 6l3 2"/>
+      </svg>;
+    case "float":
+      return <svg style={s} viewBox="0 0 32 32" fill="none" stroke={color} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+        <circle cx="16" cy="16" r="10"/><circle cx="16" cy="16" r="4"/>
+        <path d="M6 16h4M22 16h4M16 6v4M16 22v4"/>
+      </svg>;
+    case "beach":
+      return <svg style={s} viewBox="0 0 32 32" fill="none" stroke={color} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M16 5v22M5 14a11 11 0 0 1 22 0H5z"/>
+        <path d="M14 27h4"/>
+      </svg>;
+    default: return null;
+  }
 }
 
-/* ── UPDATES FEED ── */
-function addUpdate(title, detail, color) {
-  const feed = document.getElementById('updatesFeed');
-  const now = new Date();
-  const time = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false });
-  const entry = document.createElement('div');
-  entry.className = 'update-entry';
-  entry.innerHTML = `
-    <span class="update-time">${time}</span>
-    <div class="update-dot ${color || ''}"></div>
-    <div class="update-text">${title}<small>${detail}</small></div>
-  `;
-  feed.insertBefore(entry, feed.firstChild);
+// ── Phone shell — editorial, slimmer than full iOS frame ─────────────────
+function Phone({ theme, width = 320, height = 660, dark, children, statusTime = "9:41", noScroll }) {
+  const isDark = dark ?? theme.name === "Midnight";
+  return (
+    <div style={{
+      width, height, borderRadius: 44, overflow: "hidden",
+      position: "relative", background: theme.bg,
+      boxShadow: `0 24px 60px rgba(15,18,22,0.18), 0 0 0 1px ${theme.deviceFrame}, 0 0 0 8px ${theme.deviceFrame}`,
+      fontFamily: window.APR_FONTS.ui, color: theme.ink,
+    }}>
+      {/* dynamic island */}
+      <div style={{
+        position: "absolute", top: 8, left: "50%", transform: "translateX(-50%)",
+        width: 104, height: 30, borderRadius: 20, background: "#000", zIndex: 50,
+      }}/>
+      {/* status bar */}
+      <div style={{
+        position: "absolute", top: 0, left: 0, right: 0, height: 44,
+        display: "flex", justifyContent: "space-between", alignItems: "center",
+        padding: "14px 22px 0", zIndex: 20, color: isDark ? "#fff" : "#000",
+        fontSize: 13, fontWeight: 600, letterSpacing: 0.2,
+      }}>
+        <span style={{ fontVariantNumeric: "tabular-nums" }}>{statusTime}</span>
+        <span style={{ display: "flex", gap: 5, alignItems: "center" }}>
+          <svg width="15" height="10" viewBox="0 0 15 10"><rect x="0" y="6" width="2.5" height="4" rx=".5" fill="currentColor"/><rect x="4" y="4" width="2.5" height="6" rx=".5" fill="currentColor"/><rect x="8" y="2" width="2.5" height="8" rx=".5" fill="currentColor"/><rect x="12" y="0" width="2.5" height="10" rx=".5" fill="currentColor"/></svg>
+          <svg width="22" height="10" viewBox="0 0 22 10"><rect x="0.5" y="0.5" width="19" height="9" rx="2.5" stroke="currentColor" strokeOpacity=".4" fill="none"/><rect x="2" y="2" width="16" height="6" rx="1.5" fill="currentColor"/><rect x="20" y="3" width="1.5" height="4" rx=".5" fill="currentColor" fillOpacity=".4"/></svg>
+        </span>
+      </div>
+      {/* content */}
+      <div style={{
+        position: "absolute", inset: 0,
+        overflow: noScroll ? "hidden" : "auto",
+        WebkitOverflowScrolling: "touch",
+      }}>{children}</div>
+      {/* home indicator */}
+      <div style={{
+        position: "absolute", bottom: 7, left: "50%", transform: "translateX(-50%)",
+        width: 108, height: 4, borderRadius: 100,
+        background: isDark ? "rgba(255,255,255,0.55)" : "rgba(0,0,0,0.30)",
+        zIndex: 60, pointerEvents: "none",
+      }}/>
+    </div>
+  );
 }
 
-// Seed initial log entry
-addUpdate('Field app opened', 'Session started, order loaded.', 'blue');
+// ── Admiralty Bay chart ─────────────────────────────────────────────────
+// Stylized antique-nautical look of Bequia's Admiralty Bay (horseshoe
+// opening west). Coordinates roughly: land mass to the east + south, water
+// to the west. Locations: Port Elizabeth (north), Princess Margaret Beach
+// (east-central), Lower Bay (south), Anchorage moorings (open water).
+function AdmiraltyBay({ theme, width = 280, height = 220, activePin, pins = [] }) {
+  const t = theme;
+  return (
+    <svg viewBox="0 0 320 260" width={width} height={height}
+      style={{ display: "block", background: t.chartWater, borderRadius: 14 }}>
+      <defs>
+        <pattern id="waterHatch" patternUnits="userSpaceOnUse" width="6" height="6" patternTransform="rotate(35)">
+          <line x1="0" y1="0" x2="0" y2="6" stroke={t.chartContour} strokeWidth=".5"/>
+        </pattern>
+        <pattern id="landDots" patternUnits="userSpaceOnUse" width="7" height="7">
+          <circle cx="1" cy="1" r=".6" fill={t.chartContour}/>
+        </pattern>
+      </defs>
+      {/* water hatch */}
+      <rect x="0" y="0" width="320" height="260" fill="url(#waterHatch)" opacity=".45"/>
+      {/* land mass (Bequia shore — curves around east + south, opening west) */}
+      <path d="M 320 0 L 320 260 L 60 260 Q 100 220 130 200 Q 165 180 195 165 Q 230 145 255 125 Q 280 100 295 75 Q 310 45 320 0 Z"
+        fill={t.chartLand}/>
+      <path d="M 320 0 L 320 260 L 60 260 Q 100 220 130 200 Q 165 180 195 165 Q 230 145 255 125 Q 280 100 295 75 Q 310 45 320 0 Z"
+        fill="url(#landDots)" opacity=".6"/>
+      {/* contour lines on land */}
+      {[
+        "M 320 30 Q 295 55 285 85 Q 270 115 255 135 Q 230 158 200 175 Q 170 192 140 210 Q 120 222 100 240",
+        "M 320 90 Q 300 110 290 130 Q 275 152 260 168 Q 240 188 220 200 Q 200 215 180 230",
+        "M 320 160 Q 305 175 290 195 Q 275 215 260 230",
+      ].map((d, i) => (
+        <path key={i} d={d} fill="none" stroke={t.chartContour} strokeWidth=".8" strokeDasharray="2,3" opacity=".7"/>
+      ))}
+      {/* depth contours in water */}
+      {[40, 75, 115, 160].map((cx, i) => (
+        <path key={i} d={`M -10 ${cx + i * 5} Q 60 ${cx + 20} 90 ${cx + 10} T 200 ${cx + 5}`}
+          fill="none" stroke={t.chartContour} strokeWidth=".5" opacity=".6"/>
+      ))}
+      {/* shoreline */}
+      <path d="M 320 0 Q 295 55 285 85 Q 270 115 255 135 Q 230 158 200 175 Q 170 192 140 210 Q 120 222 100 240 L 60 260"
+        fill="none" stroke={t.chartContour} strokeWidth="1.2"/>
 
-/* ── TOAST ── */
-let toastTimer = null;
-function showToast(msg, type) {
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.className = 'toast show' + (type === 'green' ? ' green-toast' : type === 'amber' ? ' amber-toast' : '');
-  if (toastTimer) clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => t.classList.remove('show'), 3000);
+      {/* labels */}
+      <g style={{ fontFamily: tFont.display, fontSize: 11, fontStyle: "italic", fill: t.ink, opacity: 0.7 }}>
+        <text x="282" y="60" textAnchor="end">Port Elizabeth</text>
+        <text x="265" y="160" textAnchor="end">Princess Margaret</text>
+        <text x="200" y="232" textAnchor="end">Lower Bay</text>
+        <text x="40" y="40" style={{ fontStyle: "italic", fontSize: 10 }}>Admiralty Bay</text>
+        <text x="40" y="55" style={{ fontStyle: "italic", fontSize: 9, opacity: .55 }}>Bequia · SVG</text>
+      </g>
+
+      {/* compass rose */}
+      <g transform="translate(40,210)" stroke={t.chartContour} strokeWidth="1" fill="none">
+        <circle r="14"/>
+        <path d="M 0 -14 L 0 14 M -14 0 L 14 0"/>
+        <path d="M 0 -14 L 3 -3 L -3 -3 Z" fill={t.gold} stroke="none"/>
+        <text y="-16" style={{ fontFamily: tFont.mono, fontSize: 7, fill: t.ink, opacity: .6, textAnchor: "middle" }}>N</text>
+      </g>
+
+      {/* mooring anchors (small +'s) */}
+      {[[60, 140], [85, 175], [40, 100], [95, 110]].map(([x, y], i) => (
+        <g key={i} stroke={t.chartContour} strokeWidth=".8" opacity=".5">
+          <path d={`M ${x - 3} ${y} L ${x + 3} ${y} M ${x} ${y - 3} L ${x} ${y + 3}`}/>
+        </g>
+      ))}
+
+      {/* dispatch pins */}
+      {pins.map((p, i) => {
+        const isActive = activePin === p.id;
+        return (
+          <g key={i} transform={`translate(${p.x},${p.y})`}>
+            <circle r={isActive ? 16 : 6} fill={isActive ? t.gold : "none"} opacity=".2"/>
+            <circle r="5" fill={isActive ? t.gold : t.coral}/>
+            <circle r="2" fill={t.paper}/>
+            {isActive && (
+              <text y="-12" textAnchor="middle"
+                style={{ fontFamily: tFont.mono, fontSize: 8, fill: t.ink, fontWeight: 600 }}>
+                {p.label}
+              </text>
+            )}
+          </g>
+        );
+      })}
+
+      {/* base / shop location */}
+      <g transform="translate(290,40)">
+        <rect x="-5" y="-5" width="10" height="10" fill={t.gold}/>
+        <text y="22" textAnchor="middle" style={{ fontFamily: tFont.mono, fontSize: 7, fill: t.ink, opacity: .7, letterSpacing: 1 }}>BASE</text>
+      </g>
+    </svg>
+  );
 }
 
-/* ── NAV TABS ── */
-document.querySelectorAll('.nav-item').forEach((btn, i) => {
-  btn.addEventListener('click', () => {
-    document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    // Scroll to relevant card
-    const cards = document.querySelectorAll('.field-card');
-    if (cards[i]) cards[i].scrollIntoView({ behavior: 'smooth', block: 'start' });
-  });
+// ── Signature pad (lightweight, with placeholder line) ───────────────────
+function SignaturePad({ theme, signed, onSign, width = "100%", height = 130 }) {
+  const ref = useRef(null);
+  const drawing = useRef(false);
+  const last = useRef(null);
+
+  useEffect(() => {
+    const c = ref.current; if (!c) return;
+    const ctx = c.getContext("2d");
+    ctx.scale(2, 2);
+    ctx.lineCap = "round"; ctx.lineJoin = "round";
+    ctx.strokeStyle = theme.ink; ctx.lineWidth = 1.8;
+  }, [theme.ink]);
+
+  function pos(e) {
+    const c = ref.current; const r = c.getBoundingClientRect();
+    const p = e.touches ? e.touches[0] : e;
+    return { x: p.clientX - r.left, y: p.clientY - r.top };
+  }
+  function start(e) { e.preventDefault(); drawing.current = true; last.current = pos(e); }
+  function move(e) {
+    if (!drawing.current) return; e.preventDefault();
+    const c = ref.current; const ctx = c.getContext("2d");
+    const p = pos(e);
+    ctx.beginPath();
+    ctx.moveTo(last.current.x, last.current.y);
+    ctx.lineTo(p.x, p.y);
+    ctx.stroke();
+    last.current = p;
+    if (!signed) onSign?.(true);
+  }
+  function end() { drawing.current = false; }
+
+  function clear() {
+    const c = ref.current; const ctx = c.getContext("2d");
+    ctx.clearRect(0, 0, c.width, c.height);
+    onSign?.(false);
+  }
+
+  return (
+    <div style={{
+      position: "relative", background: theme.paper, borderRadius: 10,
+      border: `1px solid ${theme.rule}`, overflow: "hidden",
+    }}>
+      <canvas ref={ref}
+        width={600} height={height * 2}
+        style={{ width: "100%", height, display: "block", touchAction: "none" }}
+        onMouseDown={start} onMouseMove={move} onMouseUp={end} onMouseLeave={end}
+        onTouchStart={start} onTouchMove={move} onTouchEnd={end}/>
+      {!signed && (
+        <div style={{
+          position: "absolute", left: 16, right: 16, bottom: 30,
+          borderBottom: `1px solid ${theme.ruleStrong}`,
+          fontFamily: tFont.display, fontStyle: "italic",
+          color: theme.inkFaint, fontSize: 13, paddingBottom: 4, pointerEvents: "none",
+        }}>
+          Sign here
+        </div>
+      )}
+      <button onClick={clear} style={{
+        position: "absolute", top: 8, right: 10, background: "transparent",
+        border: "none", color: theme.inkFaint, fontFamily: tFont.ui,
+        fontSize: 11, letterSpacing: 1, textTransform: "uppercase", cursor: "pointer",
+      }}>Clear</button>
+    </div>
+  );
+}
+
+// ── Small primitives ─────────────────────────────────────────────────────
+function Eyebrow({ children, theme, color }) {
+  return (
+    <div style={{
+      fontFamily: tFont.ui, fontSize: 10, fontWeight: 600, letterSpacing: 2.2,
+      textTransform: "uppercase", color: color || theme.inkSoft,
+    }}>{children}</div>
+  );
+}
+
+function Pill({ children, theme, color, bg, border }) {
+  return (
+    <span style={{
+      display: "inline-flex", alignItems: "center", gap: 5,
+      padding: "3px 9px 4px", borderRadius: 999,
+      background: bg ?? "transparent",
+      border: `1px solid ${border ?? theme.rule}`,
+      color: color ?? theme.ink,
+      fontSize: 10, fontFamily: tFont.ui, fontWeight: 600, letterSpacing: 0.8,
+      textTransform: "uppercase",
+      whiteSpace: "nowrap",
+    }}>{children}</span>
+  );
+}
+
+function MonoCode({ children, theme }) {
+  return (
+    <span style={{
+      fontFamily: tFont.mono, fontSize: 10, fontWeight: 600,
+      letterSpacing: 0.5, color: theme.brand,
+      background: `color-mix(in oklab, ${theme.brand} 10%, transparent)`,
+      padding: "2px 6px", borderRadius: 4,
+    }}>{children}</span>
+  );
+}
+
+function statusMeta(status, theme) {
+  return {
+    ready:     { label: "Ready", color: theme.success, bg: `color-mix(in oklab, ${theme.success} 12%, transparent)` },
+    scheduled: { label: "Scheduled", color: theme.inkSoft, bg: `color-mix(in oklab, ${theme.ink} 6%, transparent)` },
+    enroute:   { label: "En route", color: theme.gold, bg: `color-mix(in oklab, ${theme.gold} 14%, transparent)` },
+    delivered: { label: "Delivered", color: theme.brand, bg: `color-mix(in oklab, ${theme.brand} 14%, transparent)` },
+    out:       { label: "Out", color: theme.gold, bg: `color-mix(in oklab, ${theme.gold} 14%, transparent)` },
+    service:   { label: "Service", color: theme.warn, bg: `color-mix(in oklab, ${theme.warn} 14%, transparent)` },
+  }[status];
+}
+
+Object.assign(window, {
+  Icons, GearGlyph, Phone, AdmiraltyBay, SignaturePad,
+  Eyebrow, Pill, MonoCode, statusMeta,
 });
-</script>
+
+// tFont alias for component use
+window.tFont = window.APR_FONTS;
+
+  </script>
+
+  <script type="text/babel">
+// screens.jsx — Aquatic Paradise field-worker screens.
+// One PhoneFlow component drives the whole prototype; each phone artboard
+// mounts it with a start screen and gets full internal navigation.
+
+const { useState: uS, useEffect: uE, useMemo: uM, useRef: uR } = React;
+
+const SCREENS = ["welcome", "today", "job", "scan", "waiver", "deliver", "fleet"];
+
+// ── Small UI helpers themed off the active theme ─────────────────────────
+function FillButton({ theme, children, onClick, color, ink, size = "lg", style }) {
+  const bg = color ?? theme.ink;
+  const fg = ink ?? theme.paper;
+  const pad = size === "lg" ? "16px 22px" : size === "md" ? "12px 16px" : "9px 14px";
+  return (
+    <button onClick={onClick} style={{
+      width: "100%", padding: pad, border: "none", borderRadius: 999,
+      background: bg, color: fg, cursor: "pointer",
+      fontFamily: tFont.ui, fontSize: size === "lg" ? 13 : 12,
+      fontWeight: 600, letterSpacing: 1.6, textTransform: "uppercase",
+      display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 8,
+      transition: "transform .12s, opacity .12s",
+      ...style,
+    }}
+      onMouseDown={(e) => e.currentTarget.style.transform = "scale(.98)"}
+      onMouseUp={(e) => e.currentTarget.style.transform = "scale(1)"}
+      onMouseLeave={(e) => e.currentTarget.style.transform = "scale(1)"}>
+      {children}
+    </button>
+  );
+}
+function GhostButton({ theme, children, onClick, size = "md", style }) {
+  const pad = size === "lg" ? "14px 18px" : "10px 14px";
+  return (
+    <button onClick={onClick} style={{
+      padding: pad, border: `1px solid ${theme.ruleStrong}`, borderRadius: 999,
+      background: "transparent", color: theme.ink, cursor: "pointer",
+      fontFamily: tFont.ui, fontSize: 11, fontWeight: 600,
+      letterSpacing: 1.6, textTransform: "uppercase",
+      display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 8,
+      ...style,
+    }}>{children}</button>
+  );
+}
+
+// ── Top bar (sticky) ─────────────────────────────────────────────────────
+function TopBar({ theme, title, subtitle, onBack, right }) {
+  return (
+    <div style={{
+      paddingTop: 52, paddingBottom: 14, paddingLeft: 22, paddingRight: 22,
+      display: "flex", alignItems: "flex-end", justifyContent: "space-between",
+      gap: 12, position: "sticky", top: 0, background: theme.bg, zIndex: 10,
+    }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+        {onBack && (
+          <button onClick={onBack} aria-label="Back" style={{
+            width: 34, height: 34, borderRadius: 999, border: `1px solid ${theme.rule}`,
+            background: theme.paper, color: theme.ink, cursor: "pointer",
+            display: "flex", alignItems: "center", justifyContent: "center",
+          }}>
+            <Icons.arrowL size={14}/>
+          </button>
+        )}
+        <div>
+          {subtitle && <Eyebrow theme={theme}>{subtitle}</Eyebrow>}
+          <div style={{
+            fontFamily: tFont.display, fontSize: 22, fontWeight: 500,
+            letterSpacing: -0.2, lineHeight: 1.05, color: theme.ink, marginTop: 4,
+          }}>{title}</div>
+        </div>
+      </div>
+      <div style={{ display: "flex", gap: 8 }}>{right}</div>
+    </div>
+  );
+}
+
+// ── Brand mark (small wordmark) ──────────────────────────────────────────
+function Mark({ theme, size = 14 }) {
+  return (
+    <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+      <img src="assets/logo.jpeg" width={28} height={28}
+        style={{ borderRadius: 999, objectFit: "cover", border: `1px solid ${theme.rule}` }}/>
+      <div style={{ lineHeight: 1.1 }}>
+        <div style={{
+          fontFamily: tFont.display, fontSize: size + 2, fontWeight: 500,
+          letterSpacing: 0.4, color: theme.ink,
+        }}>Aquatic Paradise</div>
+        <div style={{
+          fontFamily: tFont.ui, fontSize: 8.5, letterSpacing: 2.2,
+          textTransform: "uppercase", color: theme.inkSoft, marginTop: 2,
+        }}>Field Dispatch · v1.0</div>
+      </div>
+    </div>
+  );
+}
+
+// ── Bottom tab bar ───────────────────────────────────────────────────────
+function TabBar({ theme, current, go }) {
+  const tabs = [
+    { id: "today", label: "Today", icon: Icons.list },
+    { id: "fleet", label: "Fleet", icon: Icons.qr },
+    { id: "scan", label: "Scan", icon: Icons.camera, primary: true },
+    { id: "map", label: "Bay", icon: Icons.pin },
+    { id: "me", label: "Me", icon: Icons.user },
+  ];
+  return (
+    <div style={{
+      position: "absolute", bottom: 18, left: 16, right: 16,
+      background: theme.paper, borderRadius: 30, padding: "9px 8px",
+      display: "flex", justifyContent: "space-between", alignItems: "center",
+      boxShadow: "0 12px 30px rgba(0,0,0,.18), 0 0 0 1px " + theme.rule,
+      zIndex: 30,
+    }}>
+      {tabs.map(t => {
+        const Ico = t.icon;
+        const active = current === t.id || (t.id === "today" && current === "job");
+        return (
+          <button key={t.id} onClick={() => {
+            if (t.id === "today") go("today");
+            if (t.id === "fleet") go("fleet");
+            if (t.id === "scan") go("scan");
+            if (t.id === "map") go("today");
+            if (t.id === "me") go("welcome");
+          }} style={{
+            flex: 1, padding: t.primary ? 0 : "6px 4px", border: "none",
+            background: t.primary ? theme.ink : "transparent",
+            borderRadius: t.primary ? 22 : 14,
+            height: t.primary ? 44 : "auto", margin: t.primary ? "0 2px" : 0,
+            cursor: "pointer",
+            display: "flex", flexDirection: "column", alignItems: "center", gap: 2,
+            color: t.primary ? theme.paper : (active ? theme.ink : theme.inkFaint),
+            fontFamily: tFont.ui, fontSize: 9, fontWeight: 600, letterSpacing: 0.6,
+            textTransform: "uppercase",
+          }}>
+            <Ico size={t.primary ? 20 : 17}/>
+            {!t.primary && <span>{t.label}</span>}
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────────────────
+// SCREEN 1 — Welcome / sign-in
+// ─────────────────────────────────────────────────────────────────────────
+function ScreenWelcome({ theme, heroVariant = "chart", go, worker = "Shamar" }) {
+  const t = theme;
+  const isDark = t.name === "Midnight";
+
+  return (
+    <div style={{ minHeight: "100%", display: "flex", flexDirection: "column" }}>
+      {/* Hero treatment */}
+      <div style={{
+        position: "relative", height: 360, overflow: "hidden",
+        background: t.paper,
+      }}>
+        {heroVariant === "chart" && (
+          <div style={{ position: "absolute", inset: 0 }}>
+            <AdmiraltyBay theme={t} width="100%" height="100%" pins={[]}/>
+            <div style={{
+              position: "absolute", inset: 0,
+              background: isDark
+                ? "linear-gradient(180deg, rgba(14,26,29,0) 30%, rgba(14,26,29,0.88) 100%)"
+                : "linear-gradient(180deg, rgba(239,233,220,0) 30%, rgba(239,233,220,0.95) 100%)",
+            }}/>
+          </div>
+        )}
+        {heroVariant === "photo" && (
+          <div style={{ position: "absolute", inset: 0, overflow: "hidden" }}>
+            <div style={{
+              display: "grid", gridTemplateColumns: "1fr 1fr", gridTemplateRows: "1fr 1fr",
+              height: "100%", gap: 2,
+            }}>
+              {[
+                "assets/gear/paddleboard-turtle.jpg",
+                "assets/gear/snorkel.jpg",
+                "assets/gear/kayak.jpg",
+                "assets/gear/float-lounge.jpg",
+              ].map((src, i) => (
+                <img key={i} src={src} style={{
+                  width: "100%", height: "100%", objectFit: "cover",
+                  filter: "saturate(0.75) brightness(0.92)",
+                }}/>
+              ))}
+            </div>
+            <div style={{
+              position: "absolute", inset: 0,
+              background: isDark
+                ? "linear-gradient(180deg, rgba(14,26,29,0.35) 0%, rgba(14,26,29,0.93) 100%)"
+                : "linear-gradient(180deg, rgba(239,233,220,0.15) 0%, rgba(239,233,220,0.94) 100%)",
+            }}/>
+          </div>
+        )}
+        {heroVariant === "waves" && (
+          <div style={{ position: "absolute", inset: 0, background: t.paperWarm }}>
+            <svg viewBox="0 0 320 400" width="100%" height="100%" preserveAspectRatio="none">
+              {Array.from({ length: 14 }).map((_, i) => (
+                <path key={i}
+                  d={`M -10 ${60 + i * 22} Q 80 ${50 + i * 22} 160 ${60 + i * 22} T 330 ${60 + i * 22}`}
+                  fill="none" stroke={t.chartContour} strokeWidth=".7"
+                  opacity={0.4 + (i / 30)}>
+                  <animate attributeName="d"
+                    dur={`${6 + i * 0.3}s`}
+                    repeatCount="indefinite"
+                    values={`
+                      M -10 ${60 + i * 22} Q 80 ${50 + i * 22} 160 ${60 + i * 22} T 330 ${60 + i * 22};
+                      M -10 ${60 + i * 22} Q 80 ${70 + i * 22} 160 ${60 + i * 22} T 330 ${60 + i * 22};
+                      M -10 ${60 + i * 22} Q 80 ${50 + i * 22} 160 ${60 + i * 22} T 330 ${60 + i * 22}`}/>
+                </path>
+              ))}
+            </svg>
+          </div>
+        )}
+        {heroVariant === "wordmark" && (
+          <div style={{
+            position: "absolute", inset: 0, background: t.paperWarm,
+            display: "flex", alignItems: "center", justifyContent: "center",
+          }}>
+            <div style={{
+              fontFamily: tFont.display, fontSize: 96, fontWeight: 300,
+              fontStyle: "italic", color: t.gold, lineHeight: 0.85, textAlign: "center",
+              letterSpacing: -3,
+            }}>
+              ap<br/>
+              <span style={{ fontSize: 18, fontStyle: "normal", letterSpacing: 5,
+                textTransform: "uppercase", color: t.inkSoft, fontFamily: tFont.ui,
+                fontWeight: 600 }}>rentals</span>
+            </div>
+          </div>
+        )}
+
+        {/* logo + frame */}
+        <div style={{
+          position: "absolute", top: 56, left: 22, right: 22,
+          display: "flex", justifyContent: "space-between", alignItems: "flex-start",
+        }}>
+          <img src="assets/logo.jpeg" width={54} height={54}
+            style={{ borderRadius: 999, objectFit: "cover", border: `2px solid ${t.paper}` }}/>
+          <div style={{
+            background: t.paper, padding: "5px 11px", borderRadius: 999,
+            fontFamily: tFont.mono, fontSize: 8.5, letterSpacing: 1.5,
+            textTransform: "uppercase", color: t.ink, fontWeight: 600,
+            border: `1px solid ${t.rule}`,
+          }}>{t.mode}</div>
+        </div>
+
+        {/* hero copy */}
+        <div style={{ position: "absolute", left: 22, right: 22, bottom: 22 }}>
+          <Eyebrow theme={t}>Aquatic Paradise · Bequia</Eyebrow>
+          <div style={{
+            fontFamily: tFont.display, fontSize: 38, fontWeight: 400,
+            letterSpacing: -0.8, lineHeight: 0.98, color: t.ink, marginTop: 8,
+          }}>
+            Good morning,<br/>
+            <em style={{ color: t.gold }}>{worker}.</em>
+          </div>
+        </div>
+      </div>
+
+      {/* sign-in card */}
+      <div style={{ padding: "22px 22px 110px", background: t.bg, flex: 1 }}>
+        <div style={{
+          background: t.paper, borderRadius: 18, padding: "18px 18px 8px",
+          border: `1px solid ${t.rule}`,
+        }}>
+          <div style={{
+            display: "flex", justifyContent: "space-between", alignItems: "baseline",
+            paddingBottom: 12, borderBottom: `1px solid ${t.rule}`,
+          }}>
+            <div>
+              <Eyebrow theme={t}>Thursday, 14 May</Eyebrow>
+              <div style={{
+                fontFamily: tFont.display, fontSize: 17, marginTop: 3,
+                color: t.ink,
+              }}>4 dispatches · 2 returns due</div>
+            </div>
+            <div style={{ textAlign: "right" }}>
+              <Eyebrow theme={t}>Wind</Eyebrow>
+              <div style={{ fontFamily: tFont.mono, fontSize: 11, color: t.ink, marginTop: 3 }}>
+                ENE 12kt · 28°C
+              </div>
+            </div>
+          </div>
+
+          <div style={{ display: "flex", flexDirection: "column", gap: 0 }}>
+            {[
+              { who: "Shamar Daize",     role: "Delivery & Ops",   pin: "•••• 4421", first: "Shamar" },
+              { who: "Dravin Lewis",      role: "Delivery & Ops",   pin: "•••• 8830", first: "Dravin" },
+              { who: "Delroy Stapleton", role: "Owner — on water", pin: "•••• ↑↑↑",  first: "Delroy" },
+            ].map((p, i) => {
+              const isActive = p.first === worker;
+              return (
+              <button key={i} onClick={() => go("today")} style={{
+                padding: "14px 0", border: "none", background: "transparent",
+                borderBottom: i < 2 ? `1px solid ${t.rule}` : "none", cursor: "pointer",
+                display: "flex", justifyContent: "space-between", alignItems: "center",
+                textAlign: "left", color: t.ink,
+                opacity: isActive ? 1 : 0.45,
+              }}>
+                <div>
+                  <div style={{ fontFamily: tFont.display, fontSize: 17, color: t.ink }}>{p.who}</div>
+                  <div style={{ fontFamily: tFont.ui, fontSize: 10, letterSpacing: 1.4,
+                    textTransform: "uppercase", color: t.inkSoft, marginTop: 2 }}>{p.role}</div>
+                </div>
+                <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                  <div style={{ fontFamily: tFont.mono, fontSize: 11, color: t.inkFaint }}>{p.pin}</div>
+                  {isActive ? (
+                    <span style={{
+                      width: 22, height: 22, borderRadius: 999, background: t.gold,
+                      display: "flex", alignItems: "center", justifyContent: "center",
+                    }}><Icons.check size={12} stroke="#fff"/></span>
+                  ) : <Icons.arrowR size={14}/>}
+                </div>
+              </button>
+              );
+            })}
+          </div>
+        </div>
+
+        <div style={{ marginTop: 20, display: "flex", flexDirection: "column", gap: 10 }}>
+          <FillButton theme={t} color={t.gold} ink={isDark ? t.bg : "#fff"} onClick={() => go("today")}>
+            Sign in as {worker} <Icons.arrowR size={14}/>
+          </FillButton>
+          <div style={{ display: "flex", gap: 8, justifyContent: "center", marginTop: 4 }}>
+            <span style={{ fontFamily: tFont.mono, fontSize: 9, letterSpacing: 1.5,
+              textTransform: "uppercase", color: t.inkFaint }}>v 1.0 · Bequia ·</span>
+            <span style={{ fontFamily: tFont.mono, fontSize: 9, color: t.brand, letterSpacing: 1.5 }}>13.0097°N · 61.2414°W</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+window.ScreenWelcome = ScreenWelcome;
+window.FillButton = FillButton;
+window.GhostButton = GhostButton;
+window.TopBar = TopBar;
+window.TabBar = TabBar;
+window.Mark = Mark;
+window.SCREENS = SCREENS;
+
+  </script>
+
+  <script type="text/babel">
+// screen-today.jsx — Today's dispatch list (the home screen of the app)
+const { useState: uSt, useMemo: uMt } = React;
+
+function ScreenToday({ theme, go, setActiveJob }) {
+  const t = theme;
+  const isDark = t.name === "Midnight";
+  const [tab, setTab] = uSt("today");
+  const jobs = window.APR_DATA.todayDispatches;
+
+  return (
+    <div style={{ paddingBottom: 100 }}>
+      {/* Header */}
+      <div style={{ padding: "52px 22px 12px" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+          <Mark theme={t}/>
+          <button style={{
+            width: 36, height: 36, borderRadius: 999, border: `1px solid ${t.rule}`,
+            background: t.paper, color: t.ink, cursor: "pointer",
+            display: "flex", alignItems: "center", justifyContent: "center", position: "relative",
+          }}>
+            <Icons.bell size={15}/>
+            <span style={{
+              position: "absolute", top: 7, right: 8, width: 7, height: 7,
+              borderRadius: 999, background: t.coral, border: `1.5px solid ${t.paper}`,
+            }}/>
+          </button>
+        </div>
+
+        <div style={{ marginTop: 26, display: "flex", alignItems: "baseline", justifyContent: "space-between" }}>
+          <div>
+            <Eyebrow theme={t}>Thursday · 14 May 2026</Eyebrow>
+            <div style={{
+              fontFamily: tFont.display, fontSize: 36, fontWeight: 400,
+              letterSpacing: -0.8, lineHeight: 1, color: t.ink, marginTop: 6,
+            }}>
+              Today, on the<br/>
+              <em style={{ color: t.gold }}>water</em>.
+            </div>
+          </div>
+        </div>
+
+        {/* day stats row */}
+        <div style={{
+          marginTop: 22, padding: "12px 0",
+          borderTop: `1px solid ${t.rule}`, borderBottom: `1px solid ${t.rule}`,
+          display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 8,
+        }}>
+          {[
+            { k: "04", l: "Dispatches" },
+            { k: "11", l: "Items out" },
+            { k: "02", l: "Returns" },
+            { k: "$1.0k", l: "XCD today" },
+          ].map((m, i) => (
+            <div key={i} style={{ textAlign: i === 0 ? "left" : "center", paddingRight: 4 }}>
+              <div style={{
+                fontFamily: tFont.display, fontSize: 22, fontWeight: 500, color: t.ink, lineHeight: 1,
+              }}>{m.k}</div>
+              <div style={{
+                fontFamily: tFont.ui, fontSize: 8.5, letterSpacing: 1.5,
+                textTransform: "uppercase", color: t.inkSoft, marginTop: 4,
+              }}>{m.l}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* tabs */}
+      <div style={{ padding: "0 22px", display: "flex", gap: 18, marginTop: 4, marginBottom: 14 }}>
+        {[
+          { id: "today", label: "Today", count: 4 },
+          { id: "upcoming", label: "Upcoming", count: 7 },
+          { id: "done", label: "Done", count: 2 },
+        ].map(x => (
+          <button key={x.id} onClick={() => setTab(x.id)} style={{
+            padding: "8px 0", border: "none", background: "transparent", cursor: "pointer",
+            borderBottom: tab === x.id ? `1.5px solid ${t.ink}` : `1.5px solid transparent`,
+            fontFamily: tFont.ui, fontSize: 11, fontWeight: 600, letterSpacing: 1.6,
+            textTransform: "uppercase", color: tab === x.id ? t.ink : t.inkFaint,
+            display: "flex", alignItems: "center", gap: 6,
+          }}>
+            {x.label}
+            <span style={{
+              fontFamily: tFont.mono, fontSize: 9, letterSpacing: 0,
+              padding: "2px 5px", borderRadius: 3,
+              background: tab === x.id ? t.ink : "transparent",
+              color: tab === x.id ? t.paper : t.inkFaint,
+              border: tab === x.id ? "none" : `1px solid ${t.rule}`,
+            }}>{x.count}</span>
+          </button>
+        ))}
+      </div>
+
+      {/* dispatches */}
+      <div style={{ padding: "0 16px", display: "flex", flexDirection: "column", gap: 10 }}>
+        {jobs.map((j, idx) => {
+          const sm = statusMeta(j.status, t);
+          return (
+            <button key={j.id} onClick={() => { setActiveJob(j); go("job"); }} style={{
+              border: "none", background: t.paper, borderRadius: 16, padding: "16px 16px 14px",
+              textAlign: "left", color: t.ink, cursor: "pointer",
+              boxShadow: idx === 0 ? `0 0 0 1.5px ${t.gold}` : `0 0 0 1px ${t.rule}`,
+              position: "relative", overflow: "hidden",
+            }}>
+              {/* time column */}
+              <div style={{ display: "flex", gap: 14, alignItems: "flex-start" }}>
+                <div style={{ width: 50, flexShrink: 0, textAlign: "left" }}>
+                  <div style={{
+                    fontFamily: tFont.display, fontSize: 22, color: t.ink, lineHeight: 1,
+                  }}>{j.timeShort}</div>
+                  <div style={{
+                    fontFamily: tFont.mono, fontSize: 9, color: t.inkSoft, marginTop: 4,
+                    letterSpacing: 0.8,
+                  }}>{j.duration}</div>
+                </div>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8 }}>
+                    <span style={{
+                      fontFamily: tFont.mono, fontSize: 9, color: t.brand, letterSpacing: 1,
+                    }}>{j.id}</span>
+                    <Pill theme={t} color={sm.color} bg={sm.bg} border="transparent">{sm.label}</Pill>
+                  </div>
+                  <div style={{
+                    fontFamily: tFont.display, fontSize: 18, color: t.ink, marginTop: 4,
+                    fontWeight: 500, lineHeight: 1.15,
+                    overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
+                  }}>{j.guest}</div>
+                  <div style={{
+                    fontFamily: tFont.ui, fontSize: 11.5, color: t.inkSoft, marginTop: 3,
+                    display: "flex", alignItems: "center", gap: 5,
+                  }}>
+                    <Icons.pin size={11}/> {j.location} · party of {j.party}
+                  </div>
+                  {/* item chips */}
+                  <div style={{ display: "flex", flexWrap: "wrap", gap: 5, marginTop: 9 }}>
+                    {j.items.map((it, i) => (
+                      <span key={i} style={{
+                        display: "inline-flex", alignItems: "center", gap: 4,
+                        padding: "3px 7px 3px 5px", borderRadius: 4,
+                        background: `color-mix(in oklab, ${t.brand} 8%, ${t.bg})`,
+                        border: `1px solid ${t.rule}`,
+                      }}>
+                        <GearGlyph type={it.type} color={t.brand} size={11}/>
+                        <span style={{
+                          fontFamily: tFont.mono, fontSize: 9, color: t.brand, letterSpacing: 0.6, fontWeight: 600,
+                        }}>{it.code}</span>
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </button>
+          );
+        })}
+
+        <button style={{
+          marginTop: 4, padding: "14px", border: `1px dashed ${t.ruleStrong}`, borderRadius: 14,
+          background: "transparent", color: t.inkSoft, cursor: "pointer",
+          fontFamily: tFont.ui, fontSize: 11, fontWeight: 600, letterSpacing: 1.6,
+          textTransform: "uppercase",
+        }}>+ New walk-up booking</button>
+      </div>
+
+      <TabBar theme={t} current="today" go={go}/>
+    </div>
+  );
+}
+
+window.ScreenToday = ScreenToday;
+
+  </script>
+
+  <script type="text/babel">
+// screen-job.jsx — Booking detail (the field worker's job card)
+const { useState: uSj } = React;
+
+function ScreenJob({ theme, go, job }) {
+  const t = theme;
+  const isDark = t.name === "Midnight";
+  const j = job ?? window.APR_DATA.todayDispatches[0];
+  const sm = statusMeta(j.status, t);
+
+  return (
+    <div style={{ paddingBottom: 110 }}>
+      <TopBar theme={t} title="Job card" subtitle={`Dispatch · ${j.id}`} onBack={() => go("today")}
+        right={[
+          <button key="m" style={{
+            width: 34, height: 34, borderRadius: 999, border: `1px solid ${t.rule}`,
+            background: t.paper, color: t.ink, cursor: "pointer",
+            display: "flex", alignItems: "center", justifyContent: "center",
+          }}><Icons.more size={15}/></button>
+        ]}/>
+
+      {/* Customer block */}
+      <div style={{ padding: "0 22px" }}>
+        <div style={{
+          background: t.paper, borderRadius: 18, padding: "18px 18px 14px",
+          border: `1px solid ${t.rule}`,
+        }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 12 }}>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <Eyebrow theme={t}>Guest · {j.timeShort}–{j.when.split(" – ")[1]} · {j.duration}</Eyebrow>
+              <div style={{
+                fontFamily: tFont.display, fontSize: 26, fontWeight: 500, lineHeight: 1.05,
+                color: t.ink, marginTop: 6, letterSpacing: -0.4,
+              }}>{j.guest}</div>
+              <div style={{
+                fontFamily: tFont.ui, fontSize: 12, color: t.inkSoft, marginTop: 6,
+              }}>Party of {j.party} · {j.payment}</div>
+            </div>
+            <Pill theme={t} color={sm.color} bg={sm.bg} border="transparent">{sm.label}</Pill>
+          </div>
+
+          {/* contact buttons */}
+          <div style={{ display: "flex", gap: 8, marginTop: 14 }}>
+            <button style={{
+              flex: 1, padding: "10px", border: "none", borderRadius: 12,
+              background: "#25D366", color: "#fff", cursor: "pointer",
+              fontFamily: tFont.ui, fontSize: 11, fontWeight: 600, letterSpacing: 1.4,
+              textTransform: "uppercase",
+              display: "flex", alignItems: "center", justifyContent: "center", gap: 6,
+            }}><Icons.whatsapp size={14}/> WhatsApp</button>
+            <button style={{
+              flex: 1, padding: "10px", border: `1px solid ${t.ruleStrong}`, borderRadius: 12,
+              background: t.paper, color: t.ink, cursor: "pointer",
+              fontFamily: tFont.ui, fontSize: 11, fontWeight: 600, letterSpacing: 1.4,
+              textTransform: "uppercase",
+              display: "flex", alignItems: "center", justifyContent: "center", gap: 6,
+            }}><Icons.phone size={13}/> Call</button>
+          </div>
+
+          {/* note */}
+          {j.note && (
+            <div style={{
+              marginTop: 14, padding: "11px 12px", background: `color-mix(in oklab, ${t.gold} 14%, ${t.bg})`,
+              borderRadius: 10, borderLeft: `2px solid ${t.gold}`,
+              fontFamily: tFont.display, fontSize: 13, fontStyle: "italic", color: t.ink,
+              lineHeight: 1.4,
+            }}>"{j.note}"</div>
+          )}
+        </div>
+      </div>
+
+      {/* Map */}
+      <div style={{ padding: "16px 22px 0" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 8 }}>
+          <Eyebrow theme={t}>Delivery</Eyebrow>
+          <span style={{
+            fontFamily: tFont.mono, fontSize: 9, letterSpacing: 1, color: t.inkFaint,
+          }}>13.0097°N · 61.2414°W</span>
+        </div>
+        <div style={{ position: "relative", borderRadius: 14, overflow: "hidden", border: `1px solid ${t.rule}` }}>
+          <AdmiraltyBay theme={t} width="100%" height={180}
+            activePin={j.id}
+            pins={[{ id: j.id, x: j.pin.x, y: j.pin.y, label: j.location.toUpperCase() }]}/>
+          <div style={{
+            position: "absolute", left: 12, bottom: 12, right: 12,
+            background: t.paper, borderRadius: 10, padding: "10px 12px",
+            display: "flex", justifyContent: "space-between", alignItems: "center",
+            border: `1px solid ${t.rule}`,
+          }}>
+            <div style={{ minWidth: 0 }}>
+              <div style={{ fontFamily: tFont.display, fontSize: 14, color: t.ink, fontWeight: 500 }}>{j.location}</div>
+              <div style={{
+                fontFamily: tFont.ui, fontSize: 10, color: t.inkSoft, marginTop: 2,
+                overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
+              }}>{j.addr}</div>
+            </div>
+            <button style={{
+              padding: "6px 11px", border: "none", borderRadius: 999, background: t.ink, color: t.paper,
+              cursor: "pointer", fontFamily: tFont.ui, fontSize: 9.5, fontWeight: 600,
+              letterSpacing: 1.4, textTransform: "uppercase",
+              display: "flex", alignItems: "center", gap: 5, flexShrink: 0,
+            }}><Icons.pin size={10}/> Route</button>
+          </div>
+        </div>
+      </div>
+
+      {/* Gear manifest */}
+      <div style={{ padding: "20px 22px 0" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 8 }}>
+          <Eyebrow theme={t}>Manifest · {j.items.length} items</Eyebrow>
+          <span style={{
+            fontFamily: tFont.display, fontStyle: "italic", fontSize: 14, color: t.ink,
+          }}>${j.total}<span style={{ fontFamily: tFont.mono, fontSize: 8, marginLeft: 3, opacity: .6 }}>XCD</span></span>
+        </div>
+
+        <div style={{ background: t.paper, borderRadius: 14, border: `1px solid ${t.rule}`, overflow: "hidden" }}>
+          {j.items.map((it, i) => {
+            const imgSrc = (window.APR_GEAR_IMAGES||{})[it.code] ?? (window.APR_GEAR_IMAGES||{})[it.type] ?? null;
+            return (
+            <div key={it.code} style={{
+              padding: "12px 14px", display: "flex", alignItems: "center", gap: 12,
+              borderTop: i ? `1px solid ${t.rule}` : "none",
+            }}>
+              {imgSrc ? (
+                <div style={{ width: 38, height: 38, borderRadius: 10, overflow: "hidden", flexShrink: 0 }}>
+                  <img src={imgSrc} style={{ width: "100%", height: "100%", objectFit: "cover" }}/>
+                </div>
+              ) : (
+                <div style={{
+                  width: 38, height: 38, borderRadius: 10,
+                  background: `color-mix(in oklab, ${t.brand} 12%, ${t.bg})`,
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                  color: t.brand, flexShrink: 0,
+                }}>
+                  <GearGlyph type={it.type} color={t.brand} size={20}/>
+                </div>
+              )}
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ fontFamily: tFont.ui, fontSize: 12, color: t.ink, fontWeight: 600 }}>{it.label}</div>
+                <div style={{ display: "flex", gap: 6, marginTop: 3, alignItems: "center" }}>
+                  <span style={{
+                    fontFamily: tFont.mono, fontSize: 9.5, color: t.brand, letterSpacing: 0.7, fontWeight: 600,
+                  }}>{it.code}</span>
+                  <span style={{ fontFamily: tFont.mono, fontSize: 8.5, color: t.inkFaint }}>· PFD attached</span>
+                </div>
+              </div>
+              <Icons.check size={15} stroke={t.inkFaint}/>
+            </div>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Step tracker */}
+      <div style={{ padding: "20px 22px 16px" }}>
+        <Eyebrow theme={t}>Workflow</Eyebrow>
+        <div style={{ marginTop: 10, display: "flex", flexDirection: "column", gap: 0 }}>
+          {[
+            { k: "Manifest reviewed", state: "done" },
+            { k: "Gear scanned & checked-out", state: "current", action: () => go("scan") },
+            { k: "Waiver & briefing captured", state: "pending", action: () => go("waiver") },
+            { k: "Delivered + photo proof", state: "pending", action: () => go("deliver") },
+          ].map((s, i, a) => (
+            <button key={i} onClick={s.action} style={{
+              border: "none", background: "transparent", padding: "10px 0",
+              display: "flex", alignItems: "center", gap: 12, cursor: s.action ? "pointer" : "default",
+              textAlign: "left", color: t.ink,
+              borderBottom: i < a.length - 1 ? `1px solid ${t.rule}` : "none",
+            }}>
+              <span style={{
+                width: 22, height: 22, borderRadius: 999, flexShrink: 0,
+                border: s.state === "pending" ? `1.5px dashed ${t.ruleStrong}` : "none",
+                background: s.state === "done" ? t.success : s.state === "current" ? t.gold : "transparent",
+                color: t.paper, display: "flex", alignItems: "center", justifyContent: "center",
+                fontFamily: tFont.mono, fontSize: 10, fontWeight: 700,
+              }}>{s.state === "done" ? <Icons.check size={11} stroke="#fff"/> : (i + 1)}</span>
+              <span style={{
+                flex: 1, fontFamily: tFont.ui, fontSize: 12.5, color: s.state === "pending" ? t.inkSoft : t.ink,
+                fontWeight: s.state === "current" ? 600 : 500,
+              }}>{s.k}</span>
+              {s.action && <Icons.arrowR size={13} stroke={t.inkFaint}/>}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Action */}
+      <div style={{ padding: "0 22px" }}>
+        <FillButton theme={t} color={t.gold} ink={isDark ? t.bg : "#fff"} onClick={() => go("scan")}>
+          Scan & check out gear <Icons.qr size={14}/>
+        </FillButton>
+      </div>
+
+      <TabBar theme={t} current="job" go={go}/>
+    </div>
+  );
+}
+
+window.ScreenJob = ScreenJob;
+
+  </script>
+
+  <script type="text/babel">
+// screen-scan.jsx — QR scan & gear checkout flow
+const { useState: uSs, useEffect: uEs } = React;
+
+function ScreenScan({ theme, go, job }) {
+  const t = theme;
+  const isDark = t.name === "Midnight";
+  const j = job ?? window.APR_DATA.todayDispatches[0];
+  const [scanned, setScanned] = uSs([j.items[0].code]); // first item pre-scanned
+  const [scanning, setScanning] = uSs(true);
+
+  uEs(() => {
+    // simulate auto-scan progression: every 2.2s "find" the next item
+    if (!scanning) return;
+    const next = j.items.find(it => !scanned.includes(it.code));
+    if (!next) { setScanning(false); return; }
+    const id = setTimeout(() => setScanned(s => [...s, next.code]), 2400);
+    return () => clearTimeout(id);
+  }, [scanned, scanning, j.items]);
+
+  const allDone = scanned.length === j.items.length;
+  const latest = j.items.find(it => it.code === scanned[scanned.length - 1]);
+
+  return (
+    <div style={{ minHeight: "100%", background: t.bg, display: "flex", flexDirection: "column" }}>
+      <TopBar theme={t} title="Scan gear" subtitle={`Job · ${j.id}`} onBack={() => go("job")}/>
+
+      {/* Viewfinder */}
+      <div style={{ padding: "0 22px" }}>
+        <div style={{
+          position: "relative", aspectRatio: "1 / 1.05",
+          borderRadius: 22, overflow: "hidden",
+          background: isDark
+            ? `radial-gradient(circle at 50% 40%, ${t.paperWarm}, ${t.bg} 65%)`
+            : `radial-gradient(circle at 50% 40%, ${t.sea}33, ${t.paper})`,
+          border: `1px solid ${t.rule}`,
+        }}>
+          {/* simulated camera grain */}
+          <svg width="100%" height="100%" viewBox="0 0 200 200" preserveAspectRatio="none"
+            style={{ position: "absolute", inset: 0, opacity: 0.15 }}>
+            <defs>
+              <pattern id="grain" patternUnits="userSpaceOnUse" width="3" height="3">
+                <circle cx="1" cy="1" r=".5" fill={t.ink}/>
+              </pattern>
+            </defs>
+            <rect width="200" height="200" fill="url(#grain)"/>
+          </svg>
+
+          {/* sun glints / faux gear silhouette */}
+          <svg viewBox="0 0 200 200" preserveAspectRatio="none"
+            style={{ position: "absolute", inset: 0, width: "100%", height: "100%" }}>
+            <ellipse cx="100" cy="120" rx="70" ry="14" fill={t.gold} opacity=".22"/>
+            <ellipse cx="100" cy="105" rx="34" ry="65" fill={t.coral} opacity=".4"/>
+            <rect x="98" y="40" width="4" height="90" fill={t.ink} opacity=".55" rx="1"/>
+            <rect x="80" y="33" width="40" height="6" fill={t.ink} opacity=".55" rx="1"/>
+          </svg>
+
+          {/* viewfinder corners */}
+          {[
+            { top: 22, left: 22, b: ["t", "l"] },
+            { top: 22, right: 22, b: ["t", "r"] },
+            { bottom: 22, left: 22, b: ["b", "l"] },
+            { bottom: 22, right: 22, b: ["b", "r"] },
+          ].map((c, i) => (
+            <div key={i} style={{
+              position: "absolute", width: 30, height: 30,
+              borderTop: c.b.includes("t") ? `2px solid ${t.gold}` : "none",
+              borderBottom: c.b.includes("b") ? `2px solid ${t.gold}` : "none",
+              borderLeft: c.b.includes("l") ? `2px solid ${t.gold}` : "none",
+              borderRight: c.b.includes("r") ? `2px solid ${t.gold}` : "none",
+              borderTopLeftRadius: c.b.includes("t") && c.b.includes("l") ? 8 : 0,
+              borderTopRightRadius: c.b.includes("t") && c.b.includes("r") ? 8 : 0,
+              borderBottomLeftRadius: c.b.includes("b") && c.b.includes("l") ? 8 : 0,
+              borderBottomRightRadius: c.b.includes("b") && c.b.includes("r") ? 8 : 0,
+              top: c.top, left: c.left, right: c.right, bottom: c.bottom,
+            }}/>
+          ))}
+
+          {/* scan line */}
+          {!allDone && (
+            <div style={{
+              position: "absolute", top: 30, left: 30, right: 30, height: 2,
+              background: `linear-gradient(90deg, transparent, ${t.gold}, transparent)`,
+              animation: "scanLine 2.2s ease-in-out infinite",
+            }}/>
+          )}
+
+          {/* QR overlay label */}
+          <div style={{
+            position: "absolute", left: 22, bottom: 22, right: 22,
+            display: "flex", alignItems: "center", gap: 8,
+            background: "rgba(0,0,0,0.55)", padding: "8px 12px", borderRadius: 999,
+            color: "#fff", fontFamily: tFont.mono, fontSize: 9.5, letterSpacing: 1.2,
+          }}>
+            <span style={{
+              width: 6, height: 6, borderRadius: 999, background: allDone ? t.success : t.gold,
+              animation: allDone ? "none" : "pulse 1.4s infinite",
+            }}/>
+            {allDone ? "ALL ITEMS VERIFIED" : `SCANNING · ${latest ? latest.code : "—"}`}
+          </div>
+
+          {/* current capture readout (top) */}
+          <div style={{
+            position: "absolute", top: 18, left: 18, right: 18,
+            display: "flex", justifyContent: "space-between", alignItems: "center",
+          }}>
+            <span style={{
+              fontFamily: tFont.mono, fontSize: 9, letterSpacing: 1.5,
+              color: "#fff", background: "rgba(0,0,0,0.45)", padding: "5px 9px", borderRadius: 999,
+            }}>APR:{latest ? latest.code : "—"}|BEQUIA|SVG</span>
+            <button style={{
+              width: 30, height: 30, borderRadius: 999, border: "none",
+              background: "rgba(0,0,0,0.45)", color: "#fff", cursor: "pointer",
+              display: "flex", alignItems: "center", justifyContent: "center",
+            }}><Icons.x size={14}/></button>
+          </div>
+        </div>
+      </div>
+
+      {/* Item checklist */}
+      <div style={{ padding: "18px 22px 0" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 10 }}>
+          <Eyebrow theme={t}>Manifest · {scanned.length}/{j.items.length} verified</Eyebrow>
+          <button onClick={() => { setScanned(j.items.map(i => i.code)); setScanning(false); }}
+            style={{
+              background: "transparent", border: "none", color: t.inkSoft, cursor: "pointer",
+              fontFamily: tFont.ui, fontSize: 10, fontWeight: 600, letterSpacing: 1.4, textTransform: "uppercase",
+            }}>Mark all</button>
+        </div>
+
+        <div style={{ background: t.paper, borderRadius: 14, border: `1px solid ${t.rule}`, overflow: "hidden" }}>
+          {j.items.map((it, i) => {
+            const done = scanned.includes(it.code);
+            return (
+              <div key={it.code} style={{
+                padding: "12px 14px", display: "flex", alignItems: "center", gap: 12,
+                borderTop: i ? `1px solid ${t.rule}` : "none",
+                opacity: done ? 1 : 0.5, transition: "opacity .3s",
+              }}>
+                <div style={{
+                  width: 28, height: 28, borderRadius: 999,
+                  background: done ? t.success : "transparent",
+                  border: done ? "none" : `1.5px dashed ${t.ruleStrong}`,
+                  display: "flex", alignItems: "center", justifyContent: "center", color: "#fff",
+                }}>{done && <Icons.check size={14} stroke="#fff"/>}</div>
+                <GearGlyph type={it.type} color={done ? t.brand : t.inkFaint} size={20}/>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{
+                    fontFamily: tFont.mono, fontSize: 10.5, color: done ? t.brand : t.inkFaint,
+                    letterSpacing: 0.7, fontWeight: 600,
+                  }}>{it.code}</div>
+                  <div style={{
+                    fontFamily: tFont.ui, fontSize: 11, color: done ? t.ink : t.inkFaint, marginTop: 1,
+                  }}>{it.label}</div>
+                </div>
+                <span style={{
+                  fontFamily: tFont.mono, fontSize: 9, color: t.inkFaint,
+                }}>{done ? "09:0" + (i + 2) + "AM" : "—"}</span>
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Safety preflight */}
+        <div style={{
+          marginTop: 14, background: t.paper, borderRadius: 14, border: `1px solid ${t.rule}`,
+          padding: "12px 14px",
+        }}>
+          <Eyebrow theme={t}>Safety preflight</Eyebrow>
+          <div style={{ marginTop: 8, display: "flex", flexDirection: "column", gap: 8 }}>
+            {[
+              { l: "PFDs verified at dispatch", on: true },
+              { l: "Safety whistles confirmed", on: true },
+              { l: "Wind / current acceptable (ENE 12kt)", on: true },
+            ].map((c, i) => (
+              <div key={i} style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                <span style={{
+                  width: 18, height: 18, borderRadius: 5,
+                  background: c.on ? t.success : "transparent",
+                  border: c.on ? "none" : `1.5px solid ${t.ruleStrong}`,
+                  display: "flex", alignItems: "center", justifyContent: "center", color: "#fff",
+                }}>{c.on && <Icons.check size={11} stroke="#fff"/>}</span>
+                <span style={{ flex: 1, fontFamily: tFont.ui, fontSize: 11.5, color: t.ink }}>{c.l}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Action */}
+      <div style={{ padding: "18px 22px 100px" }}>
+        <FillButton theme={t} color={allDone ? t.gold : t.inkFaint}
+          ink={isDark ? t.bg : "#fff"} onClick={() => allDone && go("waiver")}>
+          {allDone ? "Continue to waiver" : `Scanning · ${scanned.length}/${j.items.length}`}
+          <Icons.arrowR size={14}/>
+        </FillButton>
+      </div>
+
+      <TabBar theme={t} current="scan" go={go}/>
+
+      <style>{`
+        @keyframes scanLine {
+          0%   { transform: translateY(0); opacity: 0; }
+          50%  { opacity: 1; }
+          100% { transform: translateY(280px); opacity: 0; }
+        }
+        @keyframes pulse {
+          0%,100% { opacity: 1; transform: scale(1); }
+          50%     { opacity: .4; transform: scale(1.3); }
+        }
+      `}</style>
+    </div>
+  );
+}
+
+window.ScreenScan = ScreenScan;
+
+  </script>
+
+  <script type="text/babel">
+// screen-waiver.jsx — Liability waiver + customer signature
+const { useState: uSw } = React;
+
+function ScreenWaiver({ theme, go, job }) {
+  const t = theme;
+  const isDark = t.name === "Midnight";
+  const j = job ?? window.APR_DATA.todayDispatches[0];
+  const [signed, setSigned] = uSw(false);
+  const [acks, setAcks] = uSw({ pfd: false, brief: false, weather: true });
+
+  return (
+    <div style={{ paddingBottom: 110 }}>
+      <TopBar theme={t} title="Waiver" subtitle={`Guest signature · ${j.guest.split("&")[0].trim()}`}
+        onBack={() => go("scan")}/>
+
+      {/* Editorial waiver document */}
+      <div style={{ padding: "0 22px" }}>
+        <div style={{
+          background: t.paper, borderRadius: 18, padding: "22px 22px 18px",
+          border: `1px solid ${t.rule}`, position: "relative",
+        }}>
+          {/* watermark stamp */}
+          <div style={{
+            position: "absolute", top: 18, right: 18,
+            width: 60, height: 60, borderRadius: 999,
+            border: `1.5px dashed ${t.gold}`,
+            display: "flex", alignItems: "center", justifyContent: "center",
+            color: t.gold, transform: "rotate(-12deg)",
+            fontFamily: tFont.display, fontSize: 9, lineHeight: 1.1, textAlign: "center",
+            fontStyle: "italic", padding: 6, fontWeight: 500,
+          }}>
+            Aquatic<br/>Paradise<br/>2026
+          </div>
+
+          <Eyebrow theme={t}>Form · APR-W-01</Eyebrow>
+          <div style={{
+            fontFamily: tFont.display, fontSize: 22, fontWeight: 500, marginTop: 6,
+            color: t.ink, lineHeight: 1.05, letterSpacing: -0.3, maxWidth: 200,
+          }}>
+            Liability waiver &<br/><em style={{ color: t.gold }}>rental agreement</em>
+          </div>
+
+          <div style={{
+            marginTop: 14, paddingTop: 14, borderTop: `1px solid ${t.rule}`,
+            fontFamily: tFont.display, fontSize: 12.5, lineHeight: 1.55, color: t.inkSoft,
+          }}>
+            <p>I, the undersigned, voluntarily engage Aquatic Paradise ISUP Rentals of Admiralty Bay, Bequia, in the rental of stand-up paddle boards, kayaks, snorkelling equipment and ancillary water-craft.</p>
+            <p style={{ marginTop: 8 }}>I confirm that I am a competent swimmer, that I will wear the personal flotation device provided at all times whilst aboard the equipment, and that I accept the inherent risks of open-water recreation in the Caribbean Sea.</p>
+            <p style={{ marginTop: 8 }}>I release the proprietor, his agents, employees, drivers and dependants from any and all claims arising from injury, loss or damage incurred during this rental period.</p>
+          </div>
+
+          {/* Manifest mini-print */}
+          <div style={{
+            marginTop: 14, padding: "10px 12px",
+            background: t.bg, borderRadius: 10, border: `1px solid ${t.rule}`,
+          }}>
+            <div style={{
+              fontFamily: tFont.ui, fontSize: 9, letterSpacing: 1.5,
+              textTransform: "uppercase", color: t.inkSoft,
+            }}>This contract covers</div>
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginTop: 7 }}>
+              {j.items.map(it => (
+                <span key={it.code} style={{
+                  fontFamily: tFont.mono, fontSize: 9.5, fontWeight: 600,
+                  color: t.brand, letterSpacing: 0.7,
+                  padding: "2px 6px",
+                  background: `color-mix(in oklab, ${t.brand} 10%, ${t.bg})`,
+                  borderRadius: 4,
+                }}>{it.code}</span>
+              ))}
+              <span style={{
+                fontFamily: tFont.ui, fontSize: 10, color: t.inkSoft, alignSelf: "center",
+              }}>· {j.duration} · ${j.total} XCD · {j.payment.toLowerCase()}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Acknowledgements */}
+      <div style={{ padding: "18px 22px 0" }}>
+        <Eyebrow theme={t}>Guest acknowledges</Eyebrow>
+        <div style={{
+          marginTop: 8, background: t.paper, borderRadius: 14,
+          border: `1px solid ${t.rule}`, overflow: "hidden",
+        }}>
+          {[
+            { id: "pfd", label: "PFDs fitted and demonstrated" },
+            { id: "brief", label: "Safety briefing received in full" },
+            { id: "weather", label: "Wind & current conditions disclosed" },
+          ].map((a, i) => (
+            <button key={a.id} onClick={() => setAcks(s => ({ ...s, [a.id]: !s[a.id] }))}
+              style={{
+                width: "100%", padding: "12px 14px", border: "none",
+                borderTop: i ? `1px solid ${t.rule}` : "none",
+                background: "transparent", cursor: "pointer", textAlign: "left", color: t.ink,
+                display: "flex", alignItems: "center", gap: 12,
+              }}>
+              <span style={{
+                width: 22, height: 22, borderRadius: 6,
+                background: acks[a.id] ? t.success : "transparent",
+                border: acks[a.id] ? "none" : `1.5px solid ${t.ruleStrong}`,
+                display: "flex", alignItems: "center", justifyContent: "center", color: "#fff",
+              }}>{acks[a.id] && <Icons.check size={13} stroke="#fff"/>}</span>
+              <span style={{ flex: 1, fontFamily: tFont.ui, fontSize: 12.5, color: t.ink }}>{a.label}</span>
+              <Eyebrow theme={t} color={acks[a.id] ? t.success : t.inkFaint}>
+                {acks[a.id] ? "Confirmed" : "Tap to confirm"}
+              </Eyebrow>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Signature */}
+      <div style={{ padding: "18px 22px 0" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 8 }}>
+          <Eyebrow theme={t}>Guest signature</Eyebrow>
+          <span style={{
+            fontFamily: tFont.mono, fontSize: 9, color: t.inkFaint, letterSpacing: 1,
+          }}>Thu 14 May 2026 · 08:54</span>
+        </div>
+        <SignaturePad theme={t} signed={signed} onSign={setSigned}/>
+        <div style={{
+          marginTop: 8, display: "flex", justifyContent: "space-between",
+          fontFamily: tFont.mono, fontSize: 9, color: t.inkFaint, letterSpacing: 0.6,
+        }}>
+          <span>{j.guest}</span>
+          <span>IP timestamped · audit-trail #APR-{j.id.slice(-4)}</span>
+        </div>
+      </div>
+
+      {/* Action */}
+      <div style={{ padding: "20px 22px 0" }}>
+        <FillButton theme={t}
+          color={signed && acks.pfd && acks.brief ? t.gold : t.inkFaint}
+          ink={isDark ? t.bg : "#fff"}
+          onClick={() => signed && acks.pfd && acks.brief && go("deliver")}>
+          {signed && acks.pfd && acks.brief ? "Capture delivery proof" : "Sign & acknowledge to continue"}
+          <Icons.arrowR size={14}/>
+        </FillButton>
+      </div>
+
+      <TabBar theme={t} current="job" go={go}/>
+    </div>
+  );
+}
+
+window.ScreenWaiver = ScreenWaiver;
+
+  </script>
+
+  <script type="text/babel">
+// screen-deliver.jsx — Delivery proof: photo + customer present + WhatsApp confirm
+const { useState: uSd } = React;
+
+function ScreenDeliver({ theme, go, job }) {
+  const t = theme;
+  const isDark = t.name === "Midnight";
+  const j = job ?? window.APR_DATA.todayDispatches[0];
+  const [photoTaken, setPhotoTaken] = uSd(false);
+  const [confirmed, setConfirmed] = uSd(false);
+
+  return (
+    <div style={{ paddingBottom: 110 }}>
+      <TopBar theme={t} title="Delivery" subtitle={`${j.id} · ${j.location}`}
+        onBack={() => go("waiver")}/>
+
+      {/* Photo card */}
+      <div style={{ padding: "0 22px" }}>
+        <div style={{
+          aspectRatio: "4 / 3", borderRadius: 18, overflow: "hidden",
+          background: t.paperWarm, border: `1px solid ${t.rule}`, position: "relative",
+        }}>
+          {!photoTaken ? (
+            <div style={{
+              position: "absolute", inset: 0,
+              backgroundImage: `repeating-linear-gradient(135deg, ${t.paper} 0 14px, ${t.paperWarm} 14px 28px)`,
+              display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
+              gap: 14, color: t.inkSoft,
+            }}>
+              <Icons.camera size={32}/>
+              <div style={{
+                fontFamily: tFont.display, fontSize: 16, fontStyle: "italic", color: t.ink,
+              }}>Tap to capture delivery photo</div>
+              <div style={{
+                fontFamily: tFont.mono, fontSize: 9, letterSpacing: 1.6,
+                textTransform: "uppercase", color: t.inkFaint,
+              }}>Include gear, guest, and PFDs in frame</div>
+              <button onClick={() => setPhotoTaken(true)} style={{
+                marginTop: 6, padding: "10px 18px", border: `1px solid ${t.ruleStrong}`,
+                borderRadius: 999, background: t.paper, color: t.ink, cursor: "pointer",
+                fontFamily: tFont.ui, fontSize: 10.5, fontWeight: 600, letterSpacing: 1.5,
+                textTransform: "uppercase",
+              }}>Open camera</button>
+            </div>
+          ) : (
+            <div style={{
+              position: "absolute", inset: 0,
+              background: `linear-gradient(160deg, ${t.coral}88, ${t.gold}88 30%, ${t.brand}88 65%, ${t.sea}aa)`,
+            }}>
+              {/* simulated photo content: silhouettes */}
+              <svg viewBox="0 0 320 240" preserveAspectRatio="xMidYMid slice"
+                width="100%" height="100%">
+                <rect x="0" y="0" width="320" height="160" fill={t.brand} opacity=".15"/>
+                <rect x="0" y="160" width="320" height="80" fill={t.gold} opacity=".18"/>
+                {/* sun */}
+                <circle cx="240" cy="60" r="28" fill={t.sun} opacity=".9"/>
+                {/* horizon line */}
+                <line x1="0" y1="155" x2="320" y2="155" stroke={t.ink} opacity=".25"/>
+                {/* board on beach */}
+                <ellipse cx="160" cy="200" rx="100" ry="14" fill={t.coral} opacity=".75"/>
+                <path d="M 100 198 Q 160 188 220 198 Q 200 210 160 212 Q 120 210 100 198 Z" fill={t.coral}/>
+                {/* figure */}
+                <ellipse cx="120" cy="170" rx="9" ry="9" fill={t.ink} opacity=".75"/>
+                <path d="M 113 178 L 110 220 L 116 220 L 117 195 L 122 195 L 122 220 L 128 220 L 128 178 Z" fill={t.ink} opacity=".7"/>
+                {/* paddle */}
+                <line x1="128" y1="180" x2="148" y2="160" stroke={t.ink} strokeWidth="2" opacity=".7"/>
+              </svg>
+              {/* overlay info */}
+              <div style={{
+                position: "absolute", inset: 0,
+                display: "flex", flexDirection: "column", justifyContent: "space-between",
+                padding: 14,
+              }}>
+                <div style={{
+                  display: "flex", justifyContent: "space-between", alignItems: "flex-start",
+                }}>
+                  <span style={{
+                    fontFamily: tFont.mono, fontSize: 9, letterSpacing: 1.5,
+                    color: "#fff", background: "rgba(0,0,0,0.45)",
+                    padding: "5px 10px", borderRadius: 4,
+                  }}>09:12 · {j.location.toUpperCase()}</span>
+                  <button onClick={() => setPhotoTaken(false)} style={{
+                    width: 30, height: 30, borderRadius: 999, border: "none",
+                    background: "rgba(0,0,0,0.45)", color: "#fff", cursor: "pointer",
+                    display: "flex", alignItems: "center", justifyContent: "center",
+                  }}><Icons.refresh size={14}/></button>
+                </div>
+                <div style={{
+                  background: "rgba(0,0,0,0.55)", color: "#fff",
+                  padding: "8px 12px", borderRadius: 8,
+                  fontFamily: tFont.mono, fontSize: 9, letterSpacing: 1, alignSelf: "flex-start",
+                }}>
+                  📍 13.0097°N · 61.2414°W · AI ✓ PFD detected ✓ Gear in frame
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Confirmations */}
+      <div style={{ padding: "16px 22px 0" }}>
+        <Eyebrow theme={t}>Field confirmation</Eyebrow>
+        <div style={{
+          marginTop: 8, background: t.paper, borderRadius: 14,
+          border: `1px solid ${t.rule}`, overflow: "hidden",
+        }}>
+          {[
+            { id: "present", label: "Guest present & briefed", on: true },
+            { id: "tide", label: "End-time set 13:00", on: true },
+            { id: "kit", label: `${j.items.length} items handed over`, on: true },
+          ].map((row, i) => (
+            <div key={i} style={{
+              padding: "11px 14px", display: "flex", alignItems: "center", gap: 12,
+              borderTop: i ? `1px solid ${t.rule}` : "none",
+            }}>
+              <span style={{
+                width: 20, height: 20, borderRadius: 5,
+                background: t.success, color: "#fff",
+                display: "flex", alignItems: "center", justifyContent: "center",
+              }}><Icons.check size={12} stroke="#fff"/></span>
+              <span style={{ flex: 1, fontFamily: tFont.ui, fontSize: 12, color: t.ink }}>{row.label}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* WhatsApp preview */}
+      <div style={{ padding: "16px 22px 0" }}>
+        <Eyebrow theme={t}>Confirm to guest via WhatsApp</Eyebrow>
+        <div style={{
+          marginTop: 8, background: t.paper, borderRadius: 14,
+          border: `1px solid ${t.rule}`, padding: "12px 14px",
+        }}>
+          <div style={{
+            display: "flex", alignItems: "center", gap: 8,
+            paddingBottom: 8, borderBottom: `1px solid ${t.rule}`,
+          }}>
+            <div style={{
+              width: 26, height: 26, borderRadius: 999,
+              background: "#25D366", color: "#fff",
+              display: "flex", alignItems: "center", justifyContent: "center",
+            }}><Icons.whatsapp size={13}/></div>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div style={{ fontFamily: tFont.ui, fontSize: 11, fontWeight: 600, color: t.ink }}>{j.whatsapp}</div>
+              <div style={{ fontFamily: tFont.mono, fontSize: 9, color: t.inkFaint }}>{j.guest}</div>
+            </div>
+            <button style={{
+              padding: "5px 10px", border: "none", borderRadius: 999,
+              background: "#25D366", color: "#fff", cursor: "pointer",
+              fontFamily: tFont.ui, fontSize: 9.5, fontWeight: 600, letterSpacing: 1.4,
+              textTransform: "uppercase",
+              display: "flex", alignItems: "center", gap: 5,
+            }}><Icons.send size={11}/> Send</button>
+          </div>
+          <div style={{
+            marginTop: 10, padding: "10px 12px", borderRadius: 10,
+            background: `color-mix(in oklab, ${t.brand} 10%, ${t.bg})`,
+            fontFamily: tFont.ui, fontSize: 11.5, color: t.ink, lineHeight: 1.5,
+            border: `1px solid ${t.rule}`,
+          }}>
+            Hi {j.guest.split(" ")[0]} — your gear is set up at <strong>{j.location}</strong>.
+            {j.items.length} items checked-in. Return by <strong>13:00</strong>.
+            Reply here if you need a hand. Enjoy the bay! 🏝
+          </div>
+        </div>
+      </div>
+
+      {/* Action */}
+      <div style={{ padding: "18px 22px 0" }}>
+        <FillButton theme={t} color={confirmed ? t.success : t.gold} ink={isDark ? t.bg : "#fff"}
+          onClick={() => { setConfirmed(true); setTimeout(() => go("today"), 900); }}>
+          {confirmed ? "Delivery complete ✓" : "Mark delivered & notify guest"}
+          {!confirmed && <Icons.check size={14}/>}
+        </FillButton>
+        <button onClick={() => go("today")} style={{
+          width: "100%", marginTop: 10, padding: "10px", border: "none",
+          background: "transparent", color: t.inkSoft, cursor: "pointer",
+          fontFamily: tFont.ui, fontSize: 10.5, fontWeight: 600, letterSpacing: 1.4,
+          textTransform: "uppercase",
+        }}>Save draft & return to dispatch</button>
+      </div>
+
+      <TabBar theme={t} current="job" go={go}/>
+    </div>
+  );
+}
+
+window.ScreenDeliver = ScreenDeliver;
+
+  </script>
+
+  <script type="text/babel">
+// screen-fleet.jsx — Fleet inventory + pricing + WhatsApp QR card
+const { useState: uSf } = React;
+
+function ScreenFleet({ theme, go }) {
+  const t = theme;
+  const isDark = t.name === "Midnight";
+  const [section, setSection] = uSf("fleet"); // fleet | pricing | share
+  const fleet = window.APR_DATA.fleet;
+  const pricing = window.APR_DATA.pricing;
+
+  return (
+    <div style={{ paddingBottom: 110 }}>
+      <TopBar theme={t} title="Fleet"
+        subtitle="Inventory · Bequia base"
+        onBack={() => go("today")}
+        right={[
+          <button key="add" style={{
+            padding: "8px 12px", border: "none", borderRadius: 999, background: t.ink, color: t.paper,
+            fontFamily: tFont.ui, fontSize: 9.5, fontWeight: 600, letterSpacing: 1.4,
+            textTransform: "uppercase", cursor: "pointer",
+            display: "flex", alignItems: "center", gap: 5,
+          }}><Icons.qr size={11}/> Scan in</button>
+        ]}/>
+
+      {/* sub tabs */}
+      <div style={{ padding: "0 22px", display: "flex", gap: 18, marginBottom: 14 }}>
+        {[
+          { id: "fleet", label: "Inventory" },
+          { id: "pricing", label: "Rates" },
+          { id: "share", label: "Share" },
+        ].map(x => (
+          <button key={x.id} onClick={() => setSection(x.id)} style={{
+            padding: "6px 0", border: "none", background: "transparent", cursor: "pointer",
+            borderBottom: section === x.id ? `1.5px solid ${t.ink}` : `1.5px solid transparent`,
+            fontFamily: tFont.ui, fontSize: 11, fontWeight: 600, letterSpacing: 1.6,
+            textTransform: "uppercase", color: section === x.id ? t.ink : t.inkFaint,
+          }}>{x.label}</button>
+        ))}
+      </div>
+
+      {/* Fleet roster */}
+      {section === "fleet" && (
+        <div style={{ padding: "0 22px" }}>
+          {/* Status summary */}
+          <div style={{
+            display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 8, marginBottom: 14,
+          }}>
+            {[
+              { k: "06", l: "Ready", c: t.success },
+              { k: "03", l: "Out", c: t.gold },
+              { k: "01", l: "Service", c: t.warn },
+            ].map((m, i) => (
+              <div key={i} style={{
+                background: t.paper, borderRadius: 12, padding: "12px 12px 10px",
+                border: `1px solid ${t.rule}`,
+              }}>
+                <div style={{
+                  fontFamily: tFont.display, fontSize: 22, color: m.c, lineHeight: 1, fontWeight: 500,
+                }}>{m.k}</div>
+                <div style={{
+                  fontFamily: tFont.ui, fontSize: 8.5, letterSpacing: 1.5,
+                  textTransform: "uppercase", color: t.inkSoft, marginTop: 4,
+                }}>{m.l}</div>
+              </div>
+            ))}
+          </div>
+
+          {/* Roster */}
+          <div style={{
+            background: t.paper, borderRadius: 14, border: `1px solid ${t.rule}`, overflow: "hidden",
+          }}>
+            {fleet.map((f, i) => {
+              const sm = statusMeta(f.status, t);
+              const imgSrc = (window.APR_GEAR_IMAGES||{})[f.code] ?? (window.APR_GEAR_IMAGES||{})[f.type] ?? null;
+              return (
+                <div key={f.code} style={{
+                  padding: "11px 14px", display: "flex", alignItems: "center", gap: 11,
+                  borderTop: i ? `1px solid ${t.rule}` : "none",
+                }}>
+                  {imgSrc ? (
+                    <div style={{ width: 34, height: 34, borderRadius: 8, overflow: "hidden", flexShrink: 0 }}>
+                      <img src={imgSrc} style={{ width: "100%", height: "100%", objectFit: "cover" }}/>
+                    </div>
+                  ) : (
+                    <div style={{
+                      width: 34, height: 34, borderRadius: 8,
+                      background: `color-mix(in oklab, ${t.brand} 10%, ${t.bg})`,
+                      display: "flex", alignItems: "center", justifyContent: "center",
+                      flexShrink: 0,
+                    }}>
+                      <GearGlyph type={f.type} color={t.brand} size={18}/>
+                    </div>
+                  )}
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{
+                      display: "flex", gap: 6, alignItems: "center",
+                    }}>
+                      <span style={{
+                        fontFamily: tFont.mono, fontSize: 10, fontWeight: 600,
+                        color: t.brand, letterSpacing: 0.7,
+                      }}>{f.code}</span>
+                      <Pill theme={t} color={sm.color} bg={sm.bg} border="transparent">{sm.label}</Pill>
+                    </div>
+                    <div style={{
+                      fontFamily: tFont.ui, fontSize: 10.5, color: t.inkSoft, marginTop: 2,
+                      overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
+                    }}>
+                      {f.label}{f.with ? ` · with ${f.with}` : ""}{f.note ? ` · ${f.note}` : ""}
+                    </div>
+                  </div>
+                  <Icons.arrowR size={13} stroke={t.inkFaint}/>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* Pricing card */}
+      {section === "pricing" && (
+        <div style={{ padding: "0 22px" }}>
+          <div style={{
+            background: t.paper, borderRadius: 18, border: `1px solid ${t.rule}`,
+            overflow: "hidden",
+          }}>
+            <div style={{
+              padding: "16px 18px 12px", borderBottom: `1px solid ${t.rule}`,
+              display: "flex", justifyContent: "space-between", alignItems: "baseline",
+            }}>
+              <div>
+                <Eyebrow theme={t}>Rates · 2026</Eyebrow>
+                <div style={{
+                  fontFamily: tFont.display, fontSize: 22, fontWeight: 500,
+                  color: t.ink, marginTop: 4, letterSpacing: -0.3,
+                }}>Eastern Caribbean<br/><em style={{ color: t.gold }}>Dollars (XCD)</em></div>
+              </div>
+              <span style={{
+                fontFamily: tFont.mono, fontSize: 9, letterSpacing: 1.4,
+                color: t.inkFaint,
+              }}>≈ USD ÷ 2.70</span>
+            </div>
+
+            {/* Table */}
+            <div>
+              {/* header row */}
+              <div style={{
+                display: "grid", gridTemplateColumns: "1.5fr .8fr .8fr .8fr 1fr",
+                gap: 4, padding: "10px 14px",
+                fontFamily: tFont.ui, fontSize: 9, letterSpacing: 1.4,
+                textTransform: "uppercase", color: t.inkSoft, fontWeight: 600,
+                borderBottom: `1px solid ${t.rule}`,
+              }}>
+                <span>Item</span>
+                <span style={{ textAlign: "right" }}>1h</span>
+                <span style={{ textAlign: "right" }}>2h</span>
+                <span style={{ textAlign: "right" }}>4h</span>
+                <span style={{ textAlign: "right" }}>Full day</span>
+              </div>
+
+              {pricing.map((p, i) => (
+                <div key={i} style={{
+                  display: "grid", gridTemplateColumns: "1.5fr .8fr .8fr .8fr 1fr",
+                  gap: 4, padding: "13px 14px",
+                  borderBottom: i < pricing.length - 1 ? `1px solid ${t.rule}` : "none",
+                  alignItems: "center",
+                }}>
+                  <span style={{
+                    fontFamily: tFont.display, fontSize: 14, color: t.ink, fontWeight: 500,
+                  }}>{p.item}</span>
+                  {[p.h1, p.h2, p.h4, p.full].map((v, j) => (
+                    <span key={j} style={{
+                      textAlign: "right", fontFamily: tFont.mono, fontSize: 12, color: t.ink,
+                      fontWeight: j === 3 ? 700 : 500,
+                    }}>{typeof v === "number" ? `$${v}` : v}</span>
+                  ))}
+                </div>
+              ))}
+            </div>
+
+            <div style={{
+              padding: "10px 14px", background: t.bg,
+              fontFamily: tFont.display, fontSize: 11, fontStyle: "italic", color: t.inkSoft,
+              borderTop: `1px solid ${t.rule}`, lineHeight: 1.4,
+            }}>
+              All paddle-board and kayak rentals include PFD, whistle and a safety brief from your dispatcher.
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Share / QR card */}
+      {section === "share" && (
+        <div style={{ padding: "0 22px" }}>
+          <div style={{
+            background: t.paper, borderRadius: 18, border: `1px solid ${t.rule}`,
+            padding: "22px 18px 18px", textAlign: "center",
+          }}>
+            <Eyebrow theme={t}>Show this to guests</Eyebrow>
+            <div style={{
+              fontFamily: tFont.display, fontSize: 22, fontWeight: 500, marginTop: 6,
+              color: t.ink, lineHeight: 1.05, letterSpacing: -0.3,
+            }}>Book via <em style={{ color: t.gold }}>WhatsApp</em></div>
+
+            <div style={{
+              margin: "16px auto 0", padding: 12,
+              background: "#fff", borderRadius: 14, border: `1px solid ${t.rule}`,
+              width: 200,
+            }}>
+              <img src="assets/whatsapp-qr.jpeg" alt="WhatsApp QR"
+                style={{ width: "100%", display: "block", borderRadius: 6 }}/>
+            </div>
+
+            <div style={{
+              marginTop: 14, fontFamily: tFont.mono, fontSize: 10,
+              color: t.brand, letterSpacing: 1, fontWeight: 600,
+            }}>wa.me/17844963447</div>
+            <div style={{
+              marginTop: 4, fontFamily: tFont.ui, fontSize: 10, color: t.inkSoft, letterSpacing: 0.8,
+            }}>+1 (784) 496-3447 · 7 AM – sunset, 7 days</div>
+
+            <div style={{
+              marginTop: 16, display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8,
+            }}>
+              <button style={{
+                padding: "10px", border: `1px solid ${t.ruleStrong}`, borderRadius: 999,
+                background: t.paper, color: t.ink, cursor: "pointer",
+                fontFamily: tFont.ui, fontSize: 10, fontWeight: 600, letterSpacing: 1.4,
+                textTransform: "uppercase", display: "flex", alignItems: "center", justifyContent: "center", gap: 5,
+              }}><Icons.send size={11}/> Share link</button>
+              <button style={{
+                padding: "10px", border: "none", borderRadius: 999,
+                background: t.ink, color: t.paper, cursor: "pointer",
+                fontFamily: tFont.ui, fontSize: 10, fontWeight: 600, letterSpacing: 1.4,
+                textTransform: "uppercase", display: "flex", alignItems: "center", justifyContent: "center", gap: 5,
+              }}><Icons.qr size={11}/> Print card</button>
+            </div>
+          </div>
+
+          {/* Socials */}
+          <div style={{ marginTop: 14, padding: "0 4px" }}>
+            <Eyebrow theme={t}>Follow & tag</Eyebrow>
+            <div style={{ display: "flex", gap: 8, marginTop: 8 }}>
+              {[
+                { l: "Instagram", h: "@aquaticparadiseisuprentals", c: "#E1306C" },
+                { l: "WhatsApp", h: "+1 784 496 3447", c: "#25D366" },
+                { l: "Email", h: "info@…", c: t.brand },
+              ].map((s, i) => (
+                <div key={i} style={{
+                  flex: 1, padding: "11px 10px", background: t.paper, borderRadius: 12,
+                  border: `1px solid ${t.rule}`, borderTop: `2.5px solid ${s.c}`,
+                }}>
+                  <div style={{
+                    fontFamily: tFont.ui, fontSize: 9, letterSpacing: 1.4,
+                    textTransform: "uppercase", color: t.inkSoft, fontWeight: 600,
+                  }}>{s.l}</div>
+                  <div style={{
+                    fontFamily: tFont.mono, fontSize: 9, color: t.ink, marginTop: 4,
+                    overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
+                  }}>{s.h}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      <TabBar theme={t} current="fleet" go={go}/>
+    </div>
+  );
+}
+
+window.ScreenFleet = ScreenFleet;
+
+  </script>
+
+  <script type="text/babel">
+// app-root — production single-phone shell for the Aquatic Paradise field app.
+// Replaces the design-canvas/tweaks chrome with one full-screen, responsive
+// phone that scales to fit any device, plus a day/night theme toggle.
+const { useState: uApp, useEffect: uAppE } = React;
+
+const APR_HERO = "chart";   // welcome hero treatment: chart | photo | waves | wordmark
+
+function PhoneScreens({ theme, screen, go, activeJob, setActiveJob, worker }) {
+  const t = theme;
+  const map = {
+    welcome: <ScreenWelcome theme={t} heroVariant={APR_HERO} worker={worker} go={go}/>,
+    today:   <ScreenToday   theme={t} go={go} setActiveJob={setActiveJob}/>,
+    job:     <ScreenJob     theme={t} go={go} job={activeJob}/>,
+    scan:    <ScreenScan    theme={t} go={go} job={activeJob}/>,
+    waiver:  <ScreenWaiver  theme={t} go={go} job={activeJob}/>,
+    deliver: <ScreenDeliver theme={t} go={go} job={activeJob}/>,
+    fleet:   <ScreenFleet   theme={t} go={go}/>,
+  };
+  return map[screen] ?? map.today;
+}
+
+function FieldApp() {
+  const [themeKey, setThemeKey] = uApp("linen");
+  const [screen, setScreen]     = uApp("welcome");
+  const [activeJob, setActive]  = uApp(window.APR_DATA.todayDispatches[0]);
+  const [scale, setScale]       = uApp(1);
+  const worker = "Shamar";
+  const t = window.APR_THEMES[themeKey];
+  const HEADER = 54;
+
+  // Fit the fixed 320x660 phone into whatever space the device gives us.
+  uAppE(() => {
+    function fit() {
+      const availW = window.innerWidth;
+      const availH = window.innerHeight - HEADER;
+      const s = Math.min(availW / (320 + 20), availH / (660 + 20), 1.4);
+      setScale(s);
+    }
+    fit();
+    window.addEventListener("resize", fit);
+    window.addEventListener("orientationchange", fit);
+    return () => {
+      window.removeEventListener("resize", fit);
+      window.removeEventListener("orientationchange", fit);
+    };
+  }, []);
+
+  uAppE(() => {
+    document.body.style.background = t.bg;
+    const meta = document.querySelector('meta[name="theme-color"]');
+    if (meta) meta.setAttribute("content", t.bg);
+  }, [t.bg]);
+
+  const go = (s) => setScreen(s);
+  const setActiveJob = (j) => setActive(j);
+
+  return (
+    <div style={{
+      position: "fixed", inset: 0, background: t.bg,
+      display: "flex", flexDirection: "column", overflow: "hidden",
+      transition: "background .45s ease",
+    }}>
+      {/* App chrome header */}
+      <header style={{
+        height: HEADER, flexShrink: 0,
+        paddingTop: "env(safe-area-inset-top)",
+        display: "flex", alignItems: "center", justifyContent: "space-between",
+        padding: "0 16px", borderBottom: `1px solid ${t.rule}`,
+        background: t.chrome, backdropFilter: "blur(12px)", WebkitBackdropFilter: "blur(12px)",
+      }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+          <img src="assets/logo.jpeg" width={30} height={30}
+            style={{ borderRadius: 999, objectFit: "cover", border: `1px solid ${t.rule}` }}/>
+          <div style={{ lineHeight: 1.05 }}>
+            <div style={{
+              fontFamily: window.APR_FONTS.display, fontSize: 16, fontWeight: 500,
+              letterSpacing: 0.3, color: t.ink,
+            }}>Aquatic Paradise</div>
+            <div style={{
+              fontFamily: window.APR_FONTS.ui, fontSize: 8.5, letterSpacing: 2.2,
+              textTransform: "uppercase", color: t.inkSoft, marginTop: 1,
+            }}>Field Dispatch · {t.mode}</div>
+          </div>
+        </div>
+
+        <button onClick={() => setThemeKey(k => k === "linen" ? "midnight" : "linen")}
+          aria-label="Toggle day and night theme" title="Toggle day / night"
+          style={{
+            width: 40, height: 40, borderRadius: 999, cursor: "pointer",
+            border: `1px solid ${t.chromeBorder}`, background: t.paper, color: t.ink,
+            display: "flex", alignItems: "center", justifyContent: "center",
+          }}>
+          {themeKey === "linen" ? <Icons.moon size={17}/> : <Icons.sun size={17}/>}
+        </button>
+      </header>
+
+      {/* Stage */}
+      <main style={{
+        flex: 1, minHeight: 0, position: "relative",
+        display: "flex", alignItems: "center", justifyContent: "center",
+        overflow: "hidden",
+      }}>
+        <div style={{ transform: `scale(${scale})`, transformOrigin: "center center" }}>
+          {/* key resets the phone's scroll position on each navigation / theme change */}
+          <Phone key={screen + themeKey} theme={t} width={320} height={660}>
+            <PhoneScreens theme={t} screen={screen} go={go}
+              activeJob={activeJob} setActiveJob={setActiveJob} worker={worker}/>
+          </Phone>
+        </div>
+      </main>
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(<FieldApp/>);
+
+  </script>
+
 </body>
 </html>
