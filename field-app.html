@@ -4103,15 +4103,21 @@ window.ScreenFleet = ScreenFleet;
   </script>
 
   <script>
-// app-root — production single-phone shell for the Aquatic Paradise field app.
-// Replaces the design-canvas/tweaks chrome with one full-screen, responsive
-// phone that scales to fit any device, plus a day/night theme toggle.
+// app-root — production single-phone shell + staff passcode gate.
 const {
   useState: uApp,
-  useEffect: uAppE
+  useEffect: uAppE,
+  useRef: uAppR
 } = React;
-const APR_HERO = "chart"; // welcome hero treatment: chart | photo | waves | wordmark
-
+const APR_HERO = "chart"; // welcome hero: chart | photo | waves | wordmark
+// SHA-256 of the staff passcode. Change it with (in the browser console):
+//   crypto.subtle.digest('SHA-256', new TextEncoder().encode('YOURPASS'))
+//     .then(b => console.log([...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('')))
+const APR_PASS_HASH = "8a1d12848d76ef453920021064fd00ee2fc26aa7a36be5cbbd565c1af15f85c3";
+async function sha256Hex(str) {
+  const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(str));
+  return [...new Uint8Array(buf)].map(x => x.toString(16).padStart(2, "0")).join("");
+}
 function PhoneScreens({
   theme,
   screen,
@@ -4168,13 +4174,9 @@ function FieldApp() {
   const worker = "Shamar";
   const t = window.APR_THEMES[themeKey];
   const HEADER = 54;
-
-  // Fit the fixed 320x660 phone into whatever space the device gives us.
   uAppE(() => {
     function fit() {
-      const availW = window.innerWidth;
-      const availH = window.innerHeight - HEADER;
-      const s = Math.min(availW / (320 + 20), availH / (660 + 20), 1.4);
+      const s = Math.min(window.innerWidth / (320 + 20), (window.innerHeight - HEADER) / (660 + 20), 1.4);
       setScale(s);
     }
     fit();
@@ -4301,7 +4303,163 @@ function FieldApp() {
     worker: worker
   })))));
 }
-ReactDOM.createRoot(document.getElementById("root")).render(/*#__PURE__*/React.createElement(FieldApp, null));
+
+// ── Staff passcode gate ────────────────────────────────────────────────────
+function Gate() {
+  const t = window.APR_THEMES.linen;
+  const [authed, setAuthed] = uApp(() => {
+    try {
+      return sessionStorage.getItem("apr_auth") === "1";
+    } catch (e) {
+      return false;
+    }
+  });
+  const [val, setVal] = uApp("");
+  const [err, setErr] = uApp(false);
+  const [busy, setBusy] = uApp(false);
+  const inputRef = uAppR(null);
+  uAppE(() => {
+    if (!authed && inputRef.current) inputRef.current.focus();
+  }, [authed]);
+  async function submit(e) {
+    e.preventDefault();
+    if (busy) return;
+    setBusy(true);
+    setErr(false);
+    const ok = (await sha256Hex(val)) === APR_PASS_HASH;
+    setBusy(false);
+    if (ok) {
+      try {
+        sessionStorage.setItem("apr_auth", "1");
+      } catch (e) {}
+      setAuthed(true);
+    } else {
+      setErr(true);
+      setVal("");
+      if (inputRef.current) inputRef.current.focus();
+    }
+  }
+  if (authed) return /*#__PURE__*/React.createElement(FieldApp, null);
+  return /*#__PURE__*/React.createElement("div", {
+    style: {
+      position: "fixed",
+      inset: 0,
+      background: t.bg,
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      padding: 24,
+      fontFamily: window.APR_FONTS.ui
+    }
+  }, /*#__PURE__*/React.createElement("form", {
+    onSubmit: submit,
+    style: {
+      width: "100%",
+      maxWidth: 360,
+      background: t.paper,
+      borderRadius: 22,
+      border: `1px solid ${t.rule}`,
+      padding: "30px 26px 26px",
+      textAlign: "center",
+      boxShadow: "0 24px 60px rgba(15,18,22,0.14)"
+    }
+  }, /*#__PURE__*/React.createElement("img", {
+    src: "assets/logo.jpeg",
+    width: 62,
+    height: 62,
+    style: {
+      borderRadius: 999,
+      objectFit: "cover",
+      border: `2px solid ${t.bg}`,
+      margin: "0 auto"
+    }
+  }), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontFamily: window.APR_FONTS.display,
+      fontSize: 26,
+      fontWeight: 500,
+      color: t.ink,
+      marginTop: 14,
+      letterSpacing: -0.3
+    }
+  }, "Aquatic Paradise"), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 10,
+      letterSpacing: 2.4,
+      textTransform: "uppercase",
+      color: t.inkSoft,
+      marginTop: 4,
+      fontWeight: 600
+    }
+  }, "Field Dispatch \xB7 Staff access"), /*#__PURE__*/React.createElement("input", {
+    ref: inputRef,
+    type: "password",
+    inputMode: "text",
+    autoComplete: "current-password",
+    value: val,
+    onChange: e => {
+      setVal(e.target.value);
+      setErr(false);
+    },
+    placeholder: "Enter staff passcode",
+    style: {
+      width: "100%",
+      marginTop: 22,
+      padding: "14px 16px",
+      boxSizing: "border-box",
+      borderRadius: 12,
+      border: `1px solid ${err ? t.danger : t.ruleStrong}`,
+      background: t.bg,
+      color: t.ink,
+      fontSize: 15,
+      fontFamily: window.APR_FONTS.ui,
+      textAlign: "center",
+      letterSpacing: 1,
+      outline: "none"
+    }
+  }), /*#__PURE__*/React.createElement("div", {
+    style: {
+      height: 18,
+      marginTop: 6,
+      color: t.danger,
+      fontSize: 11.5,
+      fontWeight: 600
+    }
+  }, err ? "Incorrect passcode — try again." : ""), /*#__PURE__*/React.createElement("button", {
+    type: "submit",
+    disabled: busy || !val,
+    style: {
+      width: "100%",
+      marginTop: 4,
+      padding: "15px",
+      border: "none",
+      borderRadius: 999,
+      background: busy || !val ? t.inkFaint : t.gold,
+      color: "#fff",
+      cursor: busy || !val ? "default" : "pointer",
+      fontSize: 12,
+      fontWeight: 600,
+      letterSpacing: 1.6,
+      textTransform: "uppercase",
+      display: "inline-flex",
+      alignItems: "center",
+      justifyContent: "center",
+      gap: 8
+    }
+  }, busy ? "Checking…" : "Unlock", " ", /*#__PURE__*/React.createElement(Icons.arrowR, {
+    size: 14
+  })), /*#__PURE__*/React.createElement("div", {
+    style: {
+      marginTop: 16,
+      fontSize: 9.5,
+      lineHeight: 1.5,
+      color: t.inkFaint,
+      fontFamily: window.APR_FONTS.mono,
+      letterSpacing: 0.3
+    }
+  }, "Staff only \xB7 Aquatic Paradise ISUP Rentals \xB7 Bequia")));
+}
+ReactDOM.createRoot(document.getElementById("root")).render(/*#__PURE__*/React.createElement(Gate, null));
   </script>
 
 </body>
