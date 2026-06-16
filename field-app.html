@@ -336,6 +336,7 @@ window.APR_DATA = {
   pricing
 };
 window.APR_GEAR_IMAGES = gearImages;
+window.APR_BOOKING_FORM = "https://docs.google.com/forms/d/e/1FAIpQLSdXT9U010JTZ6MJHf7Afb7hzXq-xvss3ml9CfUdrgwSlH4Lbg/viewform";
   </script>
 
   <script>
@@ -2099,6 +2100,7 @@ function ScreenToday({
       }
     }, it.code)))))));
   }), /*#__PURE__*/React.createElement("button", {
+    onClick: () => window.open(window.APR_BOOKING_FORM, "_blank", "noopener"),
     style: {
       marginTop: 4,
       padding: "14px",
