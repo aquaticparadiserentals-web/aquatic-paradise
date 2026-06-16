@@ -1,0 +1,19 @@
+{
+  "enabledPlugins": {
+    "pdf@anthropic-tools": true,
+    "docx@anthropic-tools": true,
+    "xlsx@anthropic-tools": true,
+    "pptx@anthropic-tools": true,
+    "file-reading@anthropic-tools": true,
+    "product-self-knowledge@anthropic-tools": true,
+    "frontend-design@anthropic-tools": true
+  },
+  "extraKnownMarketplaces": {
+    "anthropic-tools": {
+      "source": {
+        "source": "directory",
+        "path": "/mnt/skills/public"
+      }
+    }
+  }
+}

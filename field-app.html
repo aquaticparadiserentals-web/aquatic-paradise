@@ -1,0 +1,1552 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+  <title>APR Field App — Aquatic Paradise Rentals</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --navy:   #0B1E3D;
+      --navy2:  #162B4F;
+      --amber:  #F59E0B;
+      --amber2: #FBBF24;
+      --green:  #22C55E;
+      --red:    #EF4444;
+      --slate:  #94A3B8;
+      --white:  #F8FAFC;
+      --card:   #0F2544;
+      --border: rgba(255,255,255,0.08);
+    }
+
+    html, body {
+      min-height: 100vh;
+      background: var(--navy);
+      color: var(--white);
+      font-family: 'Inter', system-ui, sans-serif;
+      font-size: 16px;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── TOP BAR ── */
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: var(--navy);
+      border-bottom: 1px solid var(--border);
+      padding: 14px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .topbar-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .topbar-logo {
+      width: 32px;
+      height: 32px;
+      background: var(--amber);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+    }
+
+    .topbar-name {
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--white);
+    }
+
+    .topbar-name span {
+      color: var(--amber);
+    }
+
+    .topbar-status {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      color: var(--slate);
+    }
+
+    .status-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--green);
+      box-shadow: 0 0 0 0 rgba(34,197,94,0.6);
+      animation: pulse-dot 2s infinite;
+    }
+
+    @keyframes pulse-dot {
+      0%   { box-shadow: 0 0 0 0 rgba(34,197,94,0.6); }
+      70%  { box-shadow: 0 0 0 6px rgba(34,197,94,0); }
+      100% { box-shadow: 0 0 0 0 rgba(34,197,94,0); }
+    }
+
+    /* ── MAIN LAYOUT ── */
+    .app-main {
+      padding: 20px 16px 40px;
+      max-width: 480px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    /* ── ORDER BANNER ── */
+    .order-banner {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--amber);
+      border-radius: 10px;
+      padding: 14px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .order-label {
+      font-family: 'DM Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--amber);
+    }
+
+    .order-id {
+      font-family: 'DM Mono', monospace;
+      font-size: 20px;
+      font-weight: 500;
+      color: var(--white);
+      letter-spacing: 0.04em;
+    }
+
+    .order-meta {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-top: 4px;
+    }
+
+    .order-meta-item {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .order-meta-item .meta-key {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--slate);
+      font-family: 'DM Mono', monospace;
+    }
+
+    .order-meta-item .meta-val {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--white);
+    }
+
+    /* ── CARD ── */
+    .field-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .card-icon {
+      width: 34px;
+      height: 34px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      flex-shrink: 0;
+    }
+
+    .card-icon.amber { background: rgba(245,158,11,0.15); }
+    .card-icon.blue  { background: rgba(59,130,246,0.15); }
+    .card-icon.green { background: rgba(34,197,94,0.15); }
+
+    .card-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--white);
+      letter-spacing: 0.02em;
+    }
+
+    .card-subtitle {
+      font-size: 11px;
+      color: var(--slate);
+      margin-top: 1px;
+    }
+
+    .card-badge {
+      margin-left: auto;
+      font-family: 'DM Mono', monospace;
+      font-size: 10px;
+      padding: 3px 8px;
+      border-radius: 20px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    .badge-pending { background: rgba(245,158,11,0.15); color: var(--amber); }
+    .badge-done    { background: rgba(34,197,94,0.15);  color: var(--green); }
+    .badge-live    { background: rgba(59,130,246,0.15); color: #60A5FA; }
+
+    .card-body { padding: 16px; }
+
+    /* ── PHOTO CAPTURE ── */
+    .photo-slot {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 16/10;
+      border-radius: 8px;
+      overflow: hidden;
+      border: 2px dashed var(--border);
+      background: rgba(255,255,255,0.03);
+      cursor: pointer;
+      transition: border-color 0.2s, background 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .photo-slot:hover {
+      border-color: rgba(245,158,11,0.4);
+      background: rgba(245,158,11,0.04);
+    }
+
+    .photo-slot.has-image {
+      border-style: solid;
+      border-color: var(--amber);
+    }
+
+    .photo-slot img.captured {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .photo-slot .slot-placeholder {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      color: var(--slate);
+      pointer-events: none;
+    }
+
+    .slot-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      background: rgba(255,255,255,0.06);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+    }
+
+    .slot-label {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--slate);
+    }
+
+    .slot-hint {
+      font-size: 11px;
+      color: rgba(148,163,184,0.6);
+      font-family: 'DM Mono', monospace;
+    }
+
+    /* ID card frame guide */
+    .id-frame-guide {
+      position: absolute;
+      inset: 10%;
+      border: 2px solid rgba(245,158,11,0.3);
+      border-radius: 8px;
+      pointer-events: none;
+    }
+
+    .id-frame-guide::before,
+    .id-frame-guide::after {
+      content: '';
+      position: absolute;
+      width: 16px;
+      height: 16px;
+      border-color: var(--amber);
+      border-style: solid;
+    }
+
+    .id-frame-guide::before {
+      top: -2px;
+      left: -2px;
+      border-width: 2px 0 0 2px;
+      border-radius: 2px 0 0 0;
+    }
+
+    .id-frame-guide::after {
+      bottom: -2px;
+      right: -2px;
+      border-width: 0 2px 2px 0;
+      border-radius: 0 0 2px 2px;
+    }
+
+    .photo-overlay {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: flex-end;
+      padding: 10px;
+      background: linear-gradient(to top, rgba(11,30,61,0.85) 0%, transparent 50%);
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+
+    .photo-slot.has-image .photo-overlay { opacity: 1; }
+
+    .photo-retake {
+      font-size: 11px;
+      color: var(--amber2);
+      font-family: 'DM Mono', monospace;
+      letter-spacing: 0.06em;
+      cursor: pointer;
+      background: rgba(245,158,11,0.15);
+      border: 1px solid rgba(245,158,11,0.3);
+      border-radius: 4px;
+      padding: 4px 10px;
+    }
+
+    /* Camera video overlay */
+    .camera-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 200;
+      background: #000;
+      flex-direction: column;
+    }
+
+    .camera-overlay.active { display: flex; }
+
+    .camera-view {
+      flex: 1;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .camera-view video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .camera-id-guide {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 80%;
+      aspect-ratio: 85.6/54;
+      border: 2px solid rgba(245,158,11,0.7);
+      border-radius: 8px;
+      box-shadow: 0 0 0 9999px rgba(0,0,0,0.5);
+    }
+
+    .camera-id-guide .corner {
+      position: absolute;
+      width: 20px;
+      height: 20px;
+      border-color: var(--amber);
+      border-style: solid;
+    }
+
+    .camera-id-guide .corner.tl { top: -2px; left: -2px; border-width: 3px 0 0 3px; border-radius: 3px 0 0 0; }
+    .camera-id-guide .corner.tr { top: -2px; right: -2px; border-width: 3px 3px 0 0; border-radius: 0 3px 0 0; }
+    .camera-id-guide .corner.bl { bottom: -2px; left: -2px; border-width: 0 0 3px 3px; border-radius: 0 0 0 3px; }
+    .camera-id-guide .corner.br { bottom: -2px; right: -2px; border-width: 0 3px 3px 0; border-radius: 0 0 3px 0; }
+
+    .camera-guide-label {
+      position: absolute;
+      top: calc(50% - (80vw / 1.585) / 2 - 32px);
+      width: 100%;
+      text-align: center;
+      font-size: 12px;
+      color: rgba(255,255,255,0.7);
+      font-family: 'DM Mono', monospace;
+      letter-spacing: 0.08em;
+    }
+
+    .camera-controls {
+      padding: 24px 20px 36px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #000;
+    }
+
+    .cam-btn-cancel {
+      background: none;
+      border: 1px solid rgba(255,255,255,0.2);
+      color: rgba(255,255,255,0.7);
+      border-radius: 50%;
+      width: 48px;
+      height: 48px;
+      font-size: 18px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .cam-btn-shoot {
+      width: 70px;
+      height: 70px;
+      border-radius: 50%;
+      background: #fff;
+      border: 4px solid rgba(255,255,255,0.3);
+      cursor: pointer;
+      position: relative;
+      flex-shrink: 0;
+    }
+
+    .cam-btn-shoot::after {
+      content: '';
+      position: absolute;
+      inset: 4px;
+      border-radius: 50%;
+      background: #fff;
+    }
+
+    .cam-btn-switch {
+      background: none;
+      border: 1px solid rgba(255,255,255,0.2);
+      color: rgba(255,255,255,0.7);
+      border-radius: 50%;
+      width: 48px;
+      height: 48px;
+      font-size: 18px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    canvas.cam-canvas { display: none; }
+
+    /* ── PHOTO INFO ROW ── */
+    .photo-info {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .photo-info-field {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .photo-info-field label {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--slate);
+      font-family: 'DM Mono', monospace;
+    }
+
+    .photo-info-field input,
+    .photo-info-field select {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: var(--white);
+      font-size: 13px;
+      padding: 8px 10px;
+      font-family: 'Inter', sans-serif;
+      outline: none;
+      transition: border-color 0.2s;
+      width: 100%;
+    }
+
+    .photo-info-field input:focus,
+    .photo-info-field select:focus {
+      border-color: var(--amber);
+    }
+
+    .photo-info-field select option { background: var(--navy); }
+
+    /* ── ACTION BUTTON ── */
+    .action-btn {
+      width: 100%;
+      padding: 14px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      cursor: pointer;
+      border: none;
+      margin-top: 14px;
+      transition: opacity 0.2s, transform 0.1s;
+    }
+
+    .action-btn:active { transform: scale(0.98); }
+    .action-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    .action-btn.primary {
+      background: var(--amber);
+      color: var(--navy);
+    }
+
+    .action-btn.success {
+      background: var(--green);
+      color: #fff;
+    }
+
+    .action-btn.outline {
+      background: transparent;
+      border: 1px solid var(--amber);
+      color: var(--amber);
+    }
+
+    /* ── CHECKLIST ── */
+    .checklist {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: 4px;
+    }
+
+    .check-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      border-radius: 7px;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid var(--border);
+      cursor: pointer;
+      transition: background 0.15s;
+      user-select: none;
+    }
+
+    .check-item:hover { background: rgba(255,255,255,0.05); }
+
+    .check-item.checked { background: rgba(34,197,94,0.06); border-color: rgba(34,197,94,0.2); }
+
+    .check-box {
+      width: 20px;
+      height: 20px;
+      border-radius: 5px;
+      border: 2px solid var(--slate);
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      transition: background 0.15s, border-color 0.15s;
+    }
+
+    .check-item.checked .check-box {
+      background: var(--green);
+      border-color: var(--green);
+      color: #fff;
+    }
+
+    .check-text {
+      font-size: 13px;
+      color: var(--white);
+      flex: 1;
+    }
+
+    .check-item.checked .check-text {
+      color: var(--slate);
+      text-decoration: line-through;
+      text-decoration-color: rgba(148,163,184,0.4);
+    }
+
+    /* ── TRACKER MAP ── */
+    .tracker-map {
+      width: 100%;
+      aspect-ratio: 16/9;
+      border-radius: 8px;
+      background: #0D2137;
+      position: relative;
+      overflow: hidden;
+      border: 1px solid var(--border);
+    }
+
+    /* SVG road lines */
+    .map-svg {
+      width: 100%;
+      height: 100%;
+    }
+
+    /* Driver pin */
+    .driver-pin {
+      position: absolute;
+      width: 18px;
+      height: 18px;
+      transform: translate(-50%, -50%);
+      transition: left 3s cubic-bezier(0.4, 0, 0.2, 1), top 3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .driver-pin::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      background: var(--amber);
+      z-index: 2;
+    }
+
+    .driver-pin::after {
+      content: '';
+      position: absolute;
+      inset: -6px;
+      border-radius: 50%;
+      background: rgba(245,158,11,0.25);
+      animation: pulse-ring 2s infinite;
+      z-index: 1;
+    }
+
+    @keyframes pulse-ring {
+      0%   { transform: scale(0.8); opacity: 1; }
+      100% { transform: scale(2);   opacity: 0; }
+    }
+
+    .destination-pin {
+      position: absolute;
+      transform: translate(-50%, -100%);
+      font-size: 22px;
+      filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
+      animation: bob 2.5s ease-in-out infinite;
+    }
+
+    @keyframes bob {
+      0%, 100% { transform: translate(-50%, -100%); }
+      50%       { transform: translate(-50%, calc(-100% - 6px)); }
+    }
+
+    .map-label {
+      position: absolute;
+      font-family: 'DM Mono', monospace;
+      font-size: 9px;
+      letter-spacing: 0.08em;
+      color: rgba(148,163,184,0.6);
+      text-transform: uppercase;
+    }
+
+    /* ── TRACKER STATS ── */
+    .tracker-stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1px;
+      background: var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+      margin-top: 12px;
+    }
+
+    .tracker-stat {
+      background: var(--card);
+      padding: 12px 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      align-items: center;
+    }
+
+    .stat-val {
+      font-family: 'DM Mono', monospace;
+      font-size: 18px;
+      font-weight: 500;
+      color: var(--white);
+    }
+
+    .stat-key {
+      font-size: 9px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--slate);
+      font-family: 'DM Mono', monospace;
+    }
+
+    /* ── UPDATES FEED ── */
+    .updates-feed {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      margin-top: 14px;
+    }
+
+    .update-entry {
+      display: flex;
+      gap: 12px;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--border);
+      position: relative;
+    }
+
+    .update-entry:last-child { border-bottom: none; }
+
+    .update-time {
+      font-family: 'DM Mono', monospace;
+      font-size: 10px;
+      color: var(--slate);
+      width: 44px;
+      flex-shrink: 0;
+      padding-top: 2px;
+    }
+
+    .update-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--slate);
+      flex-shrink: 0;
+      margin-top: 5px;
+    }
+
+    .update-dot.amber { background: var(--amber); }
+    .update-dot.green { background: var(--green); }
+    .update-dot.blue  { background: #60A5FA; }
+
+    .update-text {
+      font-size: 13px;
+      color: var(--white);
+      line-height: 1.4;
+    }
+
+    .update-text small {
+      display: block;
+      font-size: 11px;
+      color: var(--slate);
+      margin-top: 2px;
+    }
+
+    /* ── STATUS BUTTONS ── */
+    .status-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 14px;
+    }
+
+    .status-btn {
+      padding: 10px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      cursor: pointer;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,0.04);
+      color: var(--white);
+      transition: all 0.15s;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      flex: 1 1 calc(50% - 4px);
+      min-width: 0;
+    }
+
+    .status-btn:hover { background: rgba(255,255,255,0.08); }
+    .status-btn.active-amber { background: rgba(245,158,11,0.12); border-color: var(--amber); color: var(--amber); }
+    .status-btn.active-green { background: rgba(34,197,94,0.12);  border-color: var(--green);  color: var(--green); }
+    .status-btn.active-blue  { background: rgba(96,165,250,0.12); border-color: #60A5FA;       color: #60A5FA; }
+    .status-btn.active-red   { background: rgba(239,68,68,0.12);  border-color: var(--red);    color: var(--red); }
+
+    .status-btn-icon { font-size: 18px; }
+    .status-btn-label { font-size: 11px; }
+
+    /* ── SHARE LOCATION ── */
+    .location-share-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 12px;
+      padding: 10px 12px;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+    }
+
+    .location-share-row .loc-icon {
+      font-size: 20px;
+    }
+
+    .location-share-row .loc-text {
+      flex: 1;
+    }
+
+    .location-share-row .loc-text strong {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--white);
+      display: block;
+    }
+
+    .location-share-row .loc-text small {
+      font-size: 11px;
+      color: var(--slate);
+      font-family: 'DM Mono', monospace;
+    }
+
+    .toggle-switch {
+      position: relative;
+      width: 44px;
+      height: 24px;
+      flex-shrink: 0;
+    }
+
+    .toggle-switch input { opacity: 0; width: 0; height: 0; }
+
+    .toggle-track {
+      position: absolute;
+      inset: 0;
+      border-radius: 12px;
+      background: rgba(255,255,255,0.1);
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .toggle-track::after {
+      content: '';
+      position: absolute;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: #fff;
+      top: 3px;
+      left: 3px;
+      transition: left 0.2s;
+    }
+
+    .toggle-switch input:checked + .toggle-track {
+      background: var(--green);
+    }
+
+    .toggle-switch input:checked + .toggle-track::after {
+      left: 23px;
+    }
+
+    /* ── TOAST ── */
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%) translateY(60px);
+      background: var(--navy2);
+      border: 1px solid var(--border);
+      color: var(--white);
+      padding: 12px 20px;
+      border-radius: 10px;
+      font-size: 13px;
+      font-weight: 600;
+      z-index: 300;
+      transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+      white-space: nowrap;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+    }
+
+    .toast.show { transform: translateX(-50%) translateY(0); }
+    .toast.green-toast { border-color: rgba(34,197,94,0.4); }
+    .toast.amber-toast { border-color: rgba(245,158,11,0.4); }
+
+    /* ── STEP DIVIDER ── */
+    .step-divider {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 6px 0 2px;
+    }
+
+    .step-divider span {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--slate);
+      font-family: 'DM Mono', monospace;
+      white-space: nowrap;
+    }
+
+    .step-divider::before,
+    .step-divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    /* ── BOTTOM NAV ── */
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: var(--navy);
+      border-top: 1px solid var(--border);
+      display: flex;
+      padding: 10px 0 env(safe-area-inset-bottom, 0);
+    }
+
+    .nav-item {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 3px;
+      padding: 6px 0;
+      cursor: pointer;
+      color: var(--slate);
+      transition: color 0.15s;
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      font-family: 'DM Mono', monospace;
+      border: none;
+      background: none;
+    }
+
+    .nav-item .nav-icon { font-size: 20px; }
+    .nav-item.active { color: var(--amber); }
+
+    @media (min-width: 480px) {
+      .app-main { padding: 24px 24px 40px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .status-dot, .driver-pin::after, .destination-pin { animation: none; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<header class="topbar">
+  <div class="topbar-brand">
+    <div class="topbar-logo">🌊</div>
+    <div class="topbar-name">APR <span>Field</span></div>
+  </div>
+  <div class="topbar-status">
+    <span class="status-dot"></span>
+    <span id="clock">--:--</span>
+  </div>
+</header>
+
+<!-- CAMERA OVERLAY (shared) -->
+<div class="camera-overlay" id="cameraOverlay">
+  <div class="camera-view">
+    <video id="camVideo" autoplay playsinline muted></video>
+    <canvas class="cam-canvas" id="camCanvas"></canvas>
+    <div class="camera-id-guide" id="camGuide">
+      <div class="corner tl"></div>
+      <div class="corner tr"></div>
+      <div class="corner bl"></div>
+      <div class="corner br"></div>
+    </div>
+    <div class="camera-guide-label" id="camGuideLabel">Align ID card within frame</div>
+  </div>
+  <div class="camera-controls">
+    <button class="cam-btn-cancel" id="camCancel" onclick="closeCamera()">✕</button>
+    <button class="cam-btn-shoot" id="camShoot" onclick="capturePhoto()"></button>
+    <button class="cam-btn-switch" id="camSwitch" onclick="switchCamera()">🔄</button>
+  </div>
+</div>
+
+<!-- MAIN APP -->
+<main class="app-main" id="appMain">
+
+  <!-- ORDER BANNER -->
+  <div class="order-banner">
+    <div class="order-label">Active Delivery</div>
+    <div class="order-id" id="orderId">APR-20260616-001</div>
+    <div class="order-meta">
+      <div class="order-meta-item">
+        <span class="meta-key">Customer</span>
+        <span class="meta-val" id="customerName">—</span>
+      </div>
+      <div class="order-meta-item">
+        <span class="meta-key">Gear</span>
+        <span class="meta-val" id="gearType">—</span>
+      </div>
+      <div class="order-meta-item">
+        <span class="meta-key">Pickup Time</span>
+        <span class="meta-val" id="pickupTime">—</span>
+      </div>
+      <div class="order-meta-item">
+        <span class="meta-key">Location</span>
+        <span class="meta-val" id="deliveryLoc">—</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── CARD 1: IDENTIFICATION ─── -->
+  <div class="field-card">
+    <div class="card-header">
+      <div class="card-icon amber">🪪</div>
+      <div>
+        <div class="card-title">ID Verification</div>
+        <div class="card-subtitle">Photograph customer's government-issued ID</div>
+      </div>
+      <span class="card-badge badge-pending" id="idBadge">Pending</span>
+    </div>
+    <div class="card-body">
+
+      <div class="step-divider"><span>Step 1 — Front of ID</span></div>
+
+      <!-- ID Front slot -->
+      <div class="photo-slot" id="idFrontSlot" onclick="openCamera('id-front')">
+        <div class="id-frame-guide"></div>
+        <div class="slot-placeholder" id="idFrontPlaceholder">
+          <div class="slot-icon">📷</div>
+          <span class="slot-label">Tap to photograph</span>
+          <span class="slot-hint">Passport · Driver's licence · National ID</span>
+        </div>
+        <img class="captured" id="idFrontImg" style="display:none" alt="ID front" />
+        <div class="photo-overlay">
+          <span class="photo-retake" onclick="event.stopPropagation(); openCamera('id-front')">Retake</span>
+        </div>
+      </div>
+
+      <div class="step-divider" style="margin-top:14px"><span>Step 2 — Back of ID (optional)</span></div>
+
+      <!-- ID Back slot -->
+      <div class="photo-slot" id="idBackSlot" onclick="openCamera('id-back')" style="margin-top:0">
+        <div class="id-frame-guide"></div>
+        <div class="slot-placeholder" id="idBackPlaceholder">
+          <div class="slot-icon">📷</div>
+          <span class="slot-label">Back of ID</span>
+          <span class="slot-hint">Skip if front-only document</span>
+        </div>
+        <img class="captured" id="idBackImg" style="display:none" alt="ID back" />
+        <div class="photo-overlay">
+          <span class="photo-retake" onclick="event.stopPropagation(); openCamera('id-back')">Retake</span>
+        </div>
+      </div>
+
+      <!-- ID metadata -->
+      <div class="photo-info">
+        <div class="photo-info-field">
+          <label>ID Type</label>
+          <select id="idType">
+            <option value="">Select...</option>
+            <option>Passport</option>
+            <option>Driver's Licence</option>
+            <option>National ID</option>
+            <option>Voter Card</option>
+          </select>
+        </div>
+        <div class="photo-info-field">
+          <label>ID Number</label>
+          <input type="text" id="idNumber" placeholder="Last 4 digits" maxlength="4" />
+        </div>
+        <div class="photo-info-field">
+          <label>Name on ID</label>
+          <input type="text" id="idName" placeholder="Full name" />
+        </div>
+        <div class="photo-info-field">
+          <label>Expiry</label>
+          <input type="month" id="idExpiry" />
+        </div>
+      </div>
+
+      <button class="action-btn primary" id="idConfirmBtn" onclick="confirmId()" disabled>
+        Confirm ID Verification
+      </button>
+
+    </div>
+  </div>
+
+  <!-- ─── CARD 2: DELIVERY PHOTO ─── -->
+  <div class="field-card">
+    <div class="card-header">
+      <div class="card-icon blue">📦</div>
+      <div>
+        <div class="card-title">Delivery Pickup Photo</div>
+        <div class="card-subtitle">Document the handoff — gear condition &amp; customer</div>
+      </div>
+      <span class="card-badge badge-pending" id="deliveryBadge">Pending</span>
+    </div>
+    <div class="card-body">
+
+      <!-- Gear condition checklist -->
+      <div class="step-divider"><span>Gear Condition Checklist</span></div>
+
+      <div class="checklist">
+        <div class="check-item" id="chk-board" onclick="toggleCheck('chk-board')">
+          <div class="check-box">✓</div>
+          <span class="check-text">Board / Kayak — no visible damage</span>
+        </div>
+        <div class="check-item" id="chk-paddle" onclick="toggleCheck('chk-paddle')">
+          <div class="check-box">✓</div>
+          <span class="check-text">Paddle / oar — intact, no cracks</span>
+        </div>
+        <div class="check-item" id="chk-pfd" onclick="toggleCheck('chk-pfd')">
+          <div class="check-box">✓</div>
+          <span class="check-text">Life vest / PFD — buckles working</span>
+        </div>
+        <div class="check-item" id="chk-leash" onclick="toggleCheck('chk-leash')">
+          <div class="check-box">✓</div>
+          <span class="check-text">Leash / cord — no fraying</span>
+        </div>
+        <div class="check-item" id="chk-extras" onclick="toggleCheck('chk-extras')">
+          <div class="check-box">✓</div>
+          <span class="check-text">Extras (fins, pump, snorkel kit) — complete</span>
+        </div>
+      </div>
+
+      <div class="step-divider" style="margin-top:16px"><span>Handoff Photo</span></div>
+
+      <!-- Delivery photo slot -->
+      <div class="photo-slot" id="deliverySlot" onclick="openCamera('delivery')" style="aspect-ratio:4/3">
+        <div class="slot-placeholder" id="deliveryPlaceholder">
+          <div class="slot-icon">📷</div>
+          <span class="slot-label">Photo with customer &amp; gear</span>
+          <span class="slot-hint">Both customer and equipment in frame</span>
+        </div>
+        <img class="captured" id="deliveryImg" style="display:none" alt="Delivery handoff" />
+        <div class="photo-overlay">
+          <span class="photo-retake" onclick="event.stopPropagation(); openCamera('delivery')">Retake</span>
+        </div>
+      </div>
+
+      <!-- Delivery notes -->
+      <div class="photo-info" style="grid-template-columns:1fr;">
+        <div class="photo-info-field">
+          <label>Delivery Notes</label>
+          <input type="text" id="deliveryNotes" placeholder="e.g. Left at beach entrance, gate code 1234" />
+        </div>
+      </div>
+
+      <button class="action-btn success" id="deliveryConfirmBtn" onclick="confirmDelivery()" disabled>
+        Confirm Handoff &amp; Timestamp
+      </button>
+
+    </div>
+  </div>
+
+  <!-- ─── CARD 3: DRIVER TRACKER ─── -->
+  <div class="field-card">
+    <div class="card-header">
+      <div class="card-icon green">🛺</div>
+      <div>
+        <div class="card-title">Driver Tracker</div>
+        <div class="card-subtitle">Live location &amp; status updates</div>
+      </div>
+      <span class="card-badge badge-live" id="trackerBadge">Live</span>
+    </div>
+    <div class="card-body">
+
+      <!-- Map -->
+      <div class="tracker-map" id="trackerMap">
+        <svg class="map-svg" viewBox="0 0 400 225" xmlns="http://www.w3.org/2000/svg">
+          <!-- Water background -->
+          <rect width="400" height="225" fill="#0D2137" />
+          <!-- Land masses -->
+          <ellipse cx="200" cy="120" rx="180" ry="90" fill="#0F2E1A" opacity="0.6" />
+          <!-- Roads -->
+          <path d="M20 180 Q100 120 200 100 Q300 80 380 60" stroke="#1E3A5F" stroke-width="10" fill="none" />
+          <path d="M60 210 Q120 160 180 130 Q240 100 280 80" stroke="#1A3254" stroke-width="6" fill="none" />
+          <path d="M200 100 L200 225" stroke="#1E3A5F" stroke-width="8" fill="none" />
+          <!-- Dotted center lines -->
+          <path d="M20 180 Q100 120 200 100 Q300 80 380 60" stroke="#2A4A6E" stroke-width="1.5" fill="none" stroke-dasharray="6 8" />
+          <!-- Beach/shore accent -->
+          <path d="M40 200 Q120 170 200 160 Q280 150 360 140" stroke="#1D4A2E" stroke-width="3" fill="none" opacity="0.4" />
+          <!-- Location labels -->
+          <text x="28" y="195" fill="#2A4A6E" font-size="7" font-family="monospace" letter-spacing="1">PORT ELIZABETH</text>
+          <text x="260" y="72" fill="#2A4A6E" font-size="7" font-family="monospace" letter-spacing="1">INDUSTRY BAY</text>
+          <text x="160" y="148" fill="#2A4A6E" font-size="7" font-family="monospace" letter-spacing="1">FRIENDSHIP BAY</text>
+        </svg>
+        <!-- Driver pin -->
+        <div class="driver-pin" id="driverPin" style="left:30%;top:72%"></div>
+        <!-- Destination pin -->
+        <div class="destination-pin" id="destPin" style="left:70%;top:35%">📍</div>
+        <!-- Labels -->
+        <div class="map-label" style="top:6px;left:8px;background:rgba(11,30,61,0.8);padding:3px 6px;border-radius:4px;">
+          🛺 Driver
+        </div>
+        <div class="map-label" style="top:6px;right:8px;background:rgba(11,30,61,0.8);padding:3px 6px;border-radius:4px;">
+          📍 Drop-off
+        </div>
+      </div>
+
+      <!-- Stats row -->
+      <div class="tracker-stats">
+        <div class="tracker-stat">
+          <span class="stat-val" id="etaVal">—</span>
+          <span class="stat-key">ETA (min)</span>
+        </div>
+        <div class="tracker-stat">
+          <span class="stat-val" id="distVal">—</span>
+          <span class="stat-key">Distance</span>
+        </div>
+        <div class="tracker-stat">
+          <span class="stat-val" id="speedVal">—</span>
+          <span class="stat-key">Speed</span>
+        </div>
+      </div>
+
+      <!-- Location sharing toggle -->
+      <div class="location-share-row">
+        <span class="loc-icon">📡</span>
+        <div class="loc-text">
+          <strong>Share My Location</strong>
+          <small id="locCoords">Tap toggle to enable GPS</small>
+        </div>
+        <label class="toggle-switch">
+          <input type="checkbox" id="locationToggle" onchange="toggleLocation(this)" />
+          <span class="toggle-track"></span>
+        </label>
+      </div>
+
+      <!-- Status update buttons -->
+      <div class="step-divider" style="margin-top:14px"><span>Post Status Update</span></div>
+
+      <div class="status-actions">
+        <button class="status-btn" id="btn-enroute" onclick="postStatus('enroute')">
+          <span class="status-btn-icon">🛺</span>
+          <span class="status-btn-label">En Route</span>
+        </button>
+        <button class="status-btn" id="btn-arrived" onclick="postStatus('arrived')">
+          <span class="status-btn-icon">📍</span>
+          <span class="status-btn-label">Arrived</span>
+        </button>
+        <button class="status-btn" id="btn-delivered" onclick="postStatus('delivered')">
+          <span class="status-btn-icon">✅</span>
+          <span class="status-btn-label">Delivered</span>
+        </button>
+        <button class="status-btn" id="btn-issue" onclick="postStatus('issue')">
+          <span class="status-btn-icon">⚠️</span>
+          <span class="status-btn-label">Report Issue</span>
+        </button>
+      </div>
+
+      <!-- Updates feed -->
+      <div class="step-divider" style="margin-top:14px"><span>Activity Log</span></div>
+
+      <div class="updates-feed" id="updatesFeed">
+        <!-- Populated by JS -->
+      </div>
+
+    </div>
+  </div>
+
+</main>
+
+<!-- BOTTOM NAV -->
+<nav class="bottom-nav">
+  <button class="nav-item active">
+    <span class="nav-icon">📋</span>Order
+  </button>
+  <button class="nav-item">
+    <span class="nav-icon">📷</span>Photos
+  </button>
+  <button class="nav-item">
+    <span class="nav-icon">🗺️</span>Map
+  </button>
+  <button class="nav-item">
+    <span class="nav-icon">💬</span>Chat
+  </button>
+</nav>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+/* ── CLOCK ── */
+function updateClock() {
+  const now = new Date();
+  document.getElementById('clock').textContent =
+    now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false });
+}
+updateClock();
+setInterval(updateClock, 15000);
+
+/* ── ORDER INIT ── */
+(function initOrder() {
+  const params = new URLSearchParams(location.search);
+  document.getElementById('orderId').textContent =
+    params.get('order') || 'APR-' + new Date().toISOString().slice(0,10).replace(/-/g,'') + '-001';
+  document.getElementById('customerName').textContent = params.get('name') || 'Walk-in';
+  document.getElementById('gearType').textContent = params.get('gear') || '1× SUP Board';
+  document.getElementById('pickupTime').textContent = params.get('time') || '10:00 AM';
+  document.getElementById('deliveryLoc').textContent = params.get('loc') || 'Friendship Bay';
+})();
+
+/* ── CAMERA ── */
+let stream = null;
+let activeSlot = null;
+let facingMode = 'environment';
+
+function openCamera(slot) {
+  activeSlot = slot;
+  const isId = slot.startsWith('id');
+  document.getElementById('camGuide').style.display = isId ? 'block' : 'none';
+  document.getElementById('camGuideLabel').textContent = isId
+    ? 'Align ID card within frame'
+    : 'Frame gear + customer clearly';
+
+  navigator.mediaDevices.getUserMedia({ video: { facingMode }, audio: false })
+    .then(s => {
+      stream = s;
+      const v = document.getElementById('camVideo');
+      v.srcObject = s;
+      document.getElementById('cameraOverlay').classList.add('active');
+    })
+    .catch(() => {
+      // Fallback: open file picker
+      const inp = document.createElement('input');
+      inp.type = 'file';
+      inp.accept = 'image/*';
+      inp.capture = 'environment';
+      inp.onchange = e => {
+        const file = e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = ev => applyPhoto(ev.target.result);
+        reader.readAsDataURL(file);
+      };
+      inp.click();
+    });
+}
+
+function closeCamera() {
+  if (stream) { stream.getTracks().forEach(t => t.stop()); stream = null; }
+  document.getElementById('cameraOverlay').classList.remove('active');
+  activeSlot = null;
+}
+
+function capturePhoto() {
+  const video = document.getElementById('camVideo');
+  const canvas = document.getElementById('camCanvas');
+  canvas.width = video.videoWidth;
+  canvas.height = video.videoHeight;
+  canvas.getContext('2d').drawImage(video, 0, 0);
+  const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
+  applyPhoto(dataUrl);
+  closeCamera();
+}
+
+function switchCamera() {
+  facingMode = facingMode === 'environment' ? 'user' : 'environment';
+  if (stream) { stream.getTracks().forEach(t => t.stop()); }
+  navigator.mediaDevices.getUserMedia({ video: { facingMode }, audio: false })
+    .then(s => { stream = s; document.getElementById('camVideo').srcObject = s; })
+    .catch(() => {});
+}
+
+function applyPhoto(dataUrl) {
+  if (!activeSlot) return;
+  if (activeSlot === 'id-front') {
+    const img = document.getElementById('idFrontImg');
+    img.src = dataUrl; img.style.display = 'block';
+    document.getElementById('idFrontPlaceholder').style.display = 'none';
+    document.getElementById('idFrontSlot').classList.add('has-image');
+  } else if (activeSlot === 'id-back') {
+    const img = document.getElementById('idBackImg');
+    img.src = dataUrl; img.style.display = 'block';
+    document.getElementById('idBackPlaceholder').style.display = 'none';
+    document.getElementById('idBackSlot').classList.add('has-image');
+  } else if (activeSlot === 'delivery') {
+    const img = document.getElementById('deliveryImg');
+    img.src = dataUrl; img.style.display = 'block';
+    document.getElementById('deliveryPlaceholder').style.display = 'none';
+    document.getElementById('deliverySlot').classList.add('has-image');
+  }
+  checkIdReady();
+  checkDeliveryReady();
+}
+
+/* ── ID VERIFICATION ── */
+function checkIdReady() {
+  const hasFront = document.getElementById('idFrontSlot').classList.contains('has-image');
+  document.getElementById('idConfirmBtn').disabled = !hasFront;
+}
+
+function confirmId() {
+  const badge = document.getElementById('idBadge');
+  badge.textContent = 'Verified';
+  badge.className = 'card-badge badge-done';
+  showToast('✅ ID captured and saved', 'green');
+  addUpdate('ID verified', 'Customer ID photographed and logged.', 'green');
+}
+
+/* ── CHECKLIST ── */
+function toggleCheck(id) {
+  document.getElementById(id).classList.toggle('checked');
+  checkDeliveryReady();
+}
+
+function checkDeliveryReady() {
+  const hasPhoto = document.getElementById('deliverySlot').classList.contains('has-image');
+  document.getElementById('deliveryConfirmBtn').disabled = !hasPhoto;
+}
+
+function confirmDelivery() {
+  const badge = document.getElementById('deliveryBadge');
+  badge.textContent = 'Complete';
+  badge.className = 'card-badge badge-done';
+  const ts = new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+  showToast('📦 Handoff confirmed at ' + ts, 'green');
+  addUpdate('Handoff complete', 'Gear delivered and photographed. ' + ts, 'green');
+  postStatus('delivered');
+}
+
+/* ── TRACKER ── */
+let watchId = null;
+const driverPin = document.getElementById('driverPin');
+
+// Animated driver movement demo
+const demoPath = [
+  { left: '30%', top: '72%' },
+  { left: '38%', top: '65%' },
+  { left: '46%', top: '58%' },
+  { left: '55%', top: '50%' },
+  { left: '63%', top: '42%' },
+  { left: '70%', top: '35%' },
+];
+let demoStep = 0;
+
+function startDemoMovement() {
+  setInterval(() => {
+    if (demoStep < demoPath.length) {
+      const p = demoPath[demoStep];
+      driverPin.style.left = p.left;
+      driverPin.style.top = p.top;
+      // Update ETA
+      const remaining = demoPath.length - demoStep;
+      document.getElementById('etaVal').textContent = Math.max(1, remaining * 2);
+      document.getElementById('distVal').textContent = (remaining * 0.3).toFixed(1) + 'km';
+      document.getElementById('speedVal').textContent = (15 + Math.random() * 10).toFixed(0) + 'km/h';
+      demoStep++;
+    }
+  }, 3000);
+}
+startDemoMovement();
+
+function toggleLocation(el) {
+  if (el.checked) {
+    if (!navigator.geolocation) {
+      document.getElementById('locCoords').textContent = 'GPS not available';
+      el.checked = false;
+      return;
+    }
+    watchId = navigator.geolocation.watchPosition(pos => {
+      const { latitude: lat, longitude: lng } = pos.coords;
+      document.getElementById('locCoords').textContent =
+        lat.toFixed(5) + ', ' + lng.toFixed(5);
+      addUpdate('Location shared', 'GPS: ' + lat.toFixed(4) + ', ' + lng.toFixed(4), 'blue');
+    }, () => {
+      document.getElementById('locCoords').textContent = 'Permission denied';
+      el.checked = false;
+    }, { enableHighAccuracy: true });
+    showToast('📡 Live location sharing on', 'green');
+  } else {
+    if (watchId !== null) { navigator.geolocation.clearWatch(watchId); watchId = null; }
+    document.getElementById('locCoords').textContent = 'Location sharing off';
+    showToast('📡 Location sharing off', '');
+  }
+}
+
+const statusConfig = {
+  enroute:   { label: 'En Route to Customer', color: 'amber', btnId: 'btn-enroute', cls: 'active-amber' },
+  arrived:   { label: 'Arrived at Location',  color: 'blue',  btnId: 'btn-arrived', cls: 'active-blue' },
+  delivered: { label: 'Order Delivered',       color: 'green', btnId: 'btn-delivered', cls: 'active-green' },
+  issue:     { label: 'Issue Reported',        color: 'red',   btnId: 'btn-issue', cls: 'active-red' },
+};
+
+let lastStatus = null;
+
+function postStatus(type) {
+  const cfg = statusConfig[type];
+  if (!cfg) return;
+  // Reset all buttons
+  Object.values(statusConfig).forEach(c => {
+    const btn = document.getElementById(c.btnId);
+    btn.className = 'status-btn';
+  });
+  // Activate chosen
+  document.getElementById(cfg.btnId).classList.add(cfg.cls);
+  lastStatus = type;
+  addUpdate(cfg.label, 'Status posted to booking log.', cfg.color);
+  showToast('Status: ' + cfg.label, cfg.color === 'green' ? 'green' : 'amber');
+}
+
+/* ── UPDATES FEED ── */
+function addUpdate(title, detail, color) {
+  const feed = document.getElementById('updatesFeed');
+  const now = new Date();
+  const time = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false });
+  const entry = document.createElement('div');
+  entry.className = 'update-entry';
+  entry.innerHTML = `
+    <span class="update-time">${time}</span>
+    <div class="update-dot ${color || ''}"></div>
+    <div class="update-text">${title}<small>${detail}</small></div>
+  `;
+  feed.insertBefore(entry, feed.firstChild);
+}
+
+// Seed initial log entry
+addUpdate('Field app opened', 'Session started, order loaded.', 'blue');
+
+/* ── TOAST ── */
+let toastTimer = null;
+function showToast(msg, type) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast show' + (type === 'green' ? ' green-toast' : type === 'amber' ? ' amber-toast' : '');
+  if (toastTimer) clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+/* ── NAV TABS ── */
+document.querySelectorAll('.nav-item').forEach((btn, i) => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    // Scroll to relevant card
+    const cards = document.querySelectorAll('.field-card');
+    if (cards[i]) cards[i].scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
+});
+</script>
+</body>
+</html>
