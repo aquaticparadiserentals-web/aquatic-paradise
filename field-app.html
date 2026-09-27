@@ -4,6 +4,8 @@
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
 <meta name="theme-color" content="#EFE9DC"/>
+<link rel="manifest" href="manifest.webmanifest"/>
+<link rel="apple-touch-icon" href="assets/logo.jpeg"/>
 <title>Aquatic Paradise — Field Dispatch</title>
 
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
@@ -4464,5 +4466,6 @@ function Gate() {
 ReactDOM.createRoot(document.getElementById("root")).render(/*#__PURE__*/React.createElement(Gate, null));
   </script>
 
+  <script>if("serviceWorker" in navigator){navigator.serviceWorker.register("sw.js").catch(function(){});}</script>
 </body>
 </html>

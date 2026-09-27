@@ -31,7 +31,8 @@ var APR_DEFAULTS = {
   BUSINESS_NAME:    'Aquatic Paradise ISUP Rentals',
   CREW_SHAMAR:      '',   // Shamar's WhatsApp (digits only) — fill to enable hand-off link
   CREW_DRAVIN:      '',   // Dravin's WhatsApp (digits only)
-  CALLMEBOT_APIKEY: ''    // optional: enables auto WhatsApp to the owner (see guide)
+  CALLMEBOT_APIKEY: '',   // optional: enables auto WhatsApp to the owner (see guide)
+  API_TOKEN:        'change-me-to-a-long-random-string'  // shared secret for the Admin dashboard API
 };
 
 function cfg_(key) {
@@ -181,6 +182,49 @@ function logBooking_(d, replyLink) {
   sh.appendRow([
     new Date(), 'NEW', d.name, d.phone, d.gear, d.date, d.time, d.location, d.payment, d.notes, replyLink
   ]);
+}
+
+/* ================================================================
+ * JSON API for the Owner Dashboard (Admin.html)
+ * Deploy: Apps Script -> Deploy -> New deployment -> Web app.
+ *   Execute as: Me.  Who has access: Anyone.
+ * The URL it gives you goes into Admin.html (APR_API), and the same
+ * API_TOKEN (Script property) goes into Admin.html (APR_API_TOKEN).
+ * ================================================================ */
+
+function json_(obj) {
+  return ContentService
+    .createTextOutput(JSON.stringify(obj))
+    .setMimeType(ContentService.MimeType.JSON);
+}
+
+/** GET -> returns all bookings from the Dispatch Log as JSON. */
+function doGet(e) {
+  var token = (e && e.parameter && e.parameter.token) || '';
+  if (token !== cfg_('API_TOKEN')) return json_({ ok: false, error: 'unauthorized' });
+
+  var sh = ensureLogSheet_();
+  var values = sh.getDataRange().getValues();
+  var head = values.shift() || [];
+  var bookings = values.map(function (r, i) {
+    var o = { row: i + 2 };  // sheet row number (1-based, +header)
+    head.forEach(function (h, c) { o[String(h).toLowerCase().replace(/[^a-z]/g, '')] = r[c]; });
+    return o;
+  }).reverse();  // newest first
+  return json_({ ok: true, count: bookings.length, bookings: bookings });
+}
+
+/** POST {token,row,status} -> update a booking's status cell. */
+function doPost(e) {
+  var body = {};
+  try { body = JSON.parse((e && e.postData && e.postData.contents) || '{}'); } catch (err) {}
+  if (body.token !== cfg_('API_TOKEN')) return json_({ ok: false, error: 'unauthorized' });
+
+  var sh = ensureLogSheet_();
+  var row = parseInt(body.row, 10);
+  if (!row || row < 2) return json_({ ok: false, error: 'bad row' });
+  sh.getRange(row, 2).setValue(String(body.status || 'NEW'));  // col 2 = Status
+  return json_({ ok: true, row: row, status: body.status });
 }
 
 /** Send yourself a sample ticket to confirm everything is wired. */

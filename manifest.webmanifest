@@ -1,0 +1,15 @@
+{
+  "name": "Aquatic Paradise — Rentals & Field Dispatch",
+  "short_name": "Aquatic Paradise",
+  "description": "Aquatic Paradise ISUP Rentals — customer booking, staff field dispatch, and owner command center. Works offline.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#EFE9DC",
+  "theme_color": "#1F8FA0",
+  "icons": [
+    { "src": "assets/logo.jpeg", "sizes": "192x192", "type": "image/jpeg", "purpose": "any" },
+    { "src": "assets/logo.jpeg", "sizes": "512x512", "type": "image/jpeg", "purpose": "any maskable" }
+  ]
+}
