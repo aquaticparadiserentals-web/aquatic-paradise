@@ -1,0 +1,304 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
+<meta name="theme-color" content="#EFE9DC"/>
+<title>Aquatic Paradise — Owner Command Center</title>
+<link rel="manifest" href="manifest.webmanifest"/>
+<link rel="apple-touch-icon" href="assets/logo.jpeg"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Manrope:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap"/>
+<style>
+  :root{
+    --bg:#EFE9DC; --paper:#FBF7EE; --paperWarm:#F4EDDD; --ink:#1B1A16;
+    --inkSoft:rgba(27,26,22,.62); --inkFaint:rgba(27,26,22,.36);
+    --rule:rgba(27,26,22,.10); --ruleStrong:rgba(27,26,22,.22);
+    --brand:#1F8FA0; --gold:#B58452; --coral:#C56A4F; --sea:#2C5A60;
+    --success:#436B3B; --warn:#9C5A23; --danger:#A1392C;
+    --ui:'Manrope',system-ui,sans-serif; --display:'Cormorant Garamond',Georgia,serif; --mono:'JetBrains Mono',ui-monospace,monospace;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0;height:100%}
+  body{background:var(--bg);color:var(--ink);font-family:var(--ui);-webkit-font-smoothing:antialiased}
+  a{color:inherit}
+  .eyebrow{font-size:10px;font-weight:600;letter-spacing:2.2px;text-transform:uppercase;color:var(--inkSoft)}
+  .display{font-family:var(--display)}
+  .mono{font-family:var(--mono)}
+  button{font-family:var(--ui);cursor:pointer}
+
+  /* Gate */
+  #gate{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;padding:24px;z-index:100}
+  #gate .card{width:100%;max-width:360px;background:var(--paper);border:1px solid var(--rule);border-radius:22px;padding:30px 26px 26px;text-align:center;box-shadow:0 24px 60px rgba(15,18,22,.14)}
+  #gate img{width:62px;height:62px;border-radius:999px;object-fit:cover;border:2px solid var(--bg)}
+  #gate h1{font-family:var(--display);font-size:26px;font-weight:500;margin:14px 0 2px;letter-spacing:-.3px}
+  #gate .sub{font-size:10px;letter-spacing:2.4px;text-transform:uppercase;color:var(--inkSoft);font-weight:600}
+  #gate input{width:100%;margin-top:22px;padding:14px 16px;border-radius:12px;border:1px solid var(--ruleStrong);background:var(--bg);color:var(--ink);font-size:15px;text-align:center;letter-spacing:1px;outline:none}
+  #gate .err{height:18px;margin-top:6px;color:var(--danger);font-size:11.5px;font-weight:600}
+  #gate button{width:100%;padding:15px;border:none;border-radius:999px;background:var(--gold);color:#fff;font-size:12px;font-weight:600;letter-spacing:1.6px;text-transform:uppercase}
+  #gate button:disabled{background:var(--inkFaint)}
+
+  /* App */
+  #app{display:none;max-width:920px;margin:0 auto;padding:0 16px 60px}
+  header.top{position:sticky;top:0;background:rgba(251,247,238,.85);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid var(--rule);
+    display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 4px;margin-bottom:4px;z-index:20}
+  .brand{display:flex;align-items:center;gap:10px}
+  .brand img{width:34px;height:34px;border-radius:999px;object-fit:cover;border:1px solid var(--rule)}
+  .brand .t{font-family:var(--display);font-size:18px;font-weight:500;line-height:1.05}
+  .brand .s{font-size:8px;letter-spacing:2px;text-transform:uppercase;color:var(--inkSoft)}
+  .iconbtn{width:38px;height:38px;border-radius:999px;border:1px solid var(--rule);background:var(--paper);color:var(--ink);font-size:15px;display:inline-flex;align-items:center;justify-content:center}
+  .hd{display:flex;align-items:baseline;justify-content:space-between;margin:22px 4px 12px}
+  .hd h2{font-family:var(--display);font-size:30px;font-weight:500;letter-spacing:-.6px;margin:0}
+
+  .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:0 0 8px}
+  .kpi{background:var(--paper);border:1px solid var(--rule);border-radius:14px;padding:14px 14px 12px}
+  .kpi .n{font-family:var(--display);font-size:26px;font-weight:600;line-height:1}
+  .kpi .l{font-size:8.5px;letter-spacing:1.4px;text-transform:uppercase;color:var(--inkSoft);margin-top:6px}
+  @media(max-width:560px){.kpis{grid-template-columns:repeat(2,1fr)}.hd h2{font-size:24px}}
+
+  .section{margin-top:26px}
+  .section > .eyebrow{margin:0 4px 10px}
+  .banner{background:color-mix(in oklab,var(--gold) 12%,var(--bg));border:1px solid var(--rule);border-left:3px solid var(--gold);border-radius:10px;padding:10px 14px;font-size:12.5px;color:var(--ink);margin:0 0 14px}
+
+  .booking{background:var(--paper);border:1px solid var(--rule);border-radius:16px;padding:14px 16px;margin-bottom:10px}
+  .booking .row1{display:flex;justify-content:space-between;align-items:center;gap:8px}
+  .booking .g{font-family:var(--display);font-size:19px;font-weight:500}
+  .booking .meta{font-size:12px;color:var(--inkSoft);margin-top:3px}
+  .booking .gear{font-family:var(--mono);font-size:10px;color:var(--brand);margin-top:6px}
+  .pill{display:inline-flex;align-items:center;gap:5px;padding:3px 10px 4px;border-radius:999px;font-size:10px;font-weight:600;letter-spacing:.6px;text-transform:uppercase}
+  .actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+  .btn{padding:9px 13px;border-radius:999px;border:1px solid var(--ruleStrong);background:var(--paper);color:var(--ink);font-size:10.5px;font-weight:600;letter-spacing:1px;text-transform:uppercase;display:inline-flex;align-items:center;gap:6px;text-decoration:none}
+  .btn.wa{background:#25D366;color:#fff;border-color:#25D366}
+  .btn.dark{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+  .btn.on{background:var(--gold);color:#fff;border-color:var(--gold)}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  @media(max-width:560px){.grid2{grid-template-columns:1fr}}
+  .tile{background:var(--paper);border:1px solid var(--rule);border-radius:14px;padding:14px 16px}
+  .tile h3{margin:0 0 8px;font-family:var(--display);font-size:17px;font-weight:500}
+  .link{display:flex;justify-content:space-between;align-items:center;padding:11px 0;border-bottom:1px solid var(--rule);text-decoration:none;font-size:13px}
+  .link:last-child{border-bottom:none}
+  .muted{color:var(--inkFaint);font-size:11px;font-family:var(--mono)}
+  .foot{text-align:center;color:var(--inkFaint);font-size:10px;font-family:var(--mono);margin-top:30px;letter-spacing:.4px}
+</style>
+</head>
+<body>
+
+<!-- Passcode gate -->
+<div id="gate">
+  <form class="card" id="gate-form">
+    <img src="assets/logo.jpeg" alt=""/>
+    <h1>Aquatic Paradise</h1>
+    <div class="sub">Owner Command Center</div>
+    <input id="pass" type="password" autocomplete="current-password" placeholder="Owner passcode"/>
+    <div class="err" id="err"></div>
+    <button type="submit" id="unlock" disabled>Unlock →</button>
+    <div style="margin-top:16px" class="muted">Owner access only · Bequia, SVG</div>
+  </form>
+</div>
+
+<!-- Dashboard -->
+<div id="app">
+  <header class="top">
+    <div class="brand">
+      <img src="assets/logo.jpeg" alt=""/>
+      <div><div class="t">Aquatic Paradise</div><div class="s">Owner Command Center</div></div>
+    </div>
+    <div style="display:flex;gap:8px">
+      <button class="iconbtn" id="refresh" title="Refresh bookings">⟳</button>
+      <button class="iconbtn" id="signout" title="Sign out">⎋</button>
+    </div>
+  </header>
+
+  <div class="hd">
+    <h2 id="greet">Today at a glance</h2>
+    <span class="muted" id="datastate">demo data</span>
+  </div>
+
+  <div class="kpis">
+    <div class="kpi"><div class="n" id="k-bookings">0</div><div class="l">Bookings</div></div>
+    <div class="kpi"><div class="n" id="k-rev">$0</div><div class="l">Est. XCD</div></div>
+    <div class="kpi"><div class="n" id="k-new">0</div><div class="l">Need action</div></div>
+    <div class="kpi"><div class="n" id="k-done">0</div><div class="l">Done</div></div>
+  </div>
+
+  <div class="section">
+    <div class="eyebrow">Bookings</div>
+    <div id="offline-note" class="banner" style="display:none">Showing sample data. Connect your live booking sheet in the setup to see real submissions here.</div>
+    <div id="bookings"></div>
+  </div>
+
+  <div class="section">
+    <div class="eyebrow">Reach the team (WhatsApp)</div>
+    <div class="grid2" id="team"></div>
+  </div>
+
+  <div class="section">
+    <div class="eyebrow">Quick links</div>
+    <div class="tile">
+      <a class="link" id="ql-form" target="_blank" rel="noopener" href="#">📋 Open booking form <span class="muted">form</span></a>
+      <a class="link" href="field-app.html">📱 Field app (staff) <span class="muted">app</span></a>
+      <a class="link" href="index.html">🏝 Customer site <span class="muted">public</span></a>
+    </div>
+  </div>
+
+  <div class="foot" id="foot">Aquatic Paradise ISUP Rentals · Bequia, SVG</div>
+</div>
+
+<script>
+/* ---------- CONFIG (edit these) ---------------------------------- */
+// SHA-256 of the OWNER passcode. Default word: paradise-owner-2026
+var APR_OWNER_HASH = "2d058943240b5edb8e7c9fe7ee162b571e3ac191c8a3868eb7b4f83aafa2262b";
+var APR_BOOKING_FORM = "https://docs.google.com/forms/d/e/1FAIpQLSdXT9U010JTZ6MJHf7Afb7hzXq-xvss3ml9CfUdrgwSlH4Lbg/viewform";
+// Live data (optional): paste your Apps Script Web App URL + token to see real bookings.
+var APR_API = "";           // e.g. https://script.google.com/macros/s/AKfy.../exec
+var APR_API_TOKEN = "";     // must match the API_TOKEN Script property
+// Team WhatsApp numbers (digits only, country code first). Fill in real numbers.
+var APR_TEAM = [
+  { name: "Delroy (Owner)", role: "Owner — on water", wa: "17844963447" },
+  { name: "Shamar Daize",   role: "Delivery & Ops",   wa: "" },
+  { name: "Dravin Lewis",   role: "Delivery & Ops",   wa: "" }
+];
+/* ---------------------------------------------------------------- */
+
+var DEMO = [
+  { row:0, status:"NEW",       name:"Margaux & Henri Bernier", whatsapp:"+33 6 14 22 89 04", gear:"2× Paddle Board + Snorkel Kit", date:"2026-06-20", time:"09:00", location:"Princess Margaret Beach", payment:"Online — paid", notes:"Honeymoon — welcome card please.", total:270 },
+  { row:0, status:"ASSIGNED", name:"Tana Whitfield",          whatsapp:"+1 246 822 0014",   gear:"Double Kayak + Beach Setup",   date:"2026-06-20", time:"10:30", location:"Lower Bay",              payment:"Cash on delivery", notes:"Fabric PFD (neoprene allergy).", total:170 },
+  { row:0, status:"DONE",     name:"Rashida Forbes +3",       whatsapp:"+1 784 433 9912",   gear:"Kayak + Beach Setup",          date:"2026-06-20", time:"14:00", location:"Princess Margaret Beach", payment:"Online — paid", notes:"Birthday group, 2 non-swimmers.", total:220 }
+];
+
+function sha256Hex(str){
+  return crypto.subtle.digest("SHA-256", new TextEncoder().encode(str))
+    .then(function(b){return [].map.call(new Uint8Array(b),function(x){return x.toString(16).padStart(2,"0")}).join("")});
+}
+function el(id){return document.getElementById(id)}
+function esc(s){return String(s==null?"":s).replace(/[&<>]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;"}[c]})}
+function digits(s){return String(s||"").replace(/[^0-9]/g,"")}
+
+var STATUS = {
+  NEW:      {label:"New",      color:"var(--gold)",    bg:"color-mix(in oklab,var(--gold) 16%,var(--bg))"},
+  ASSIGNED: {label:"Assigned", color:"var(--brand)",   bg:"color-mix(in oklab,var(--brand) 14%,var(--bg))"},
+  DONE:     {label:"Done",     color:"var(--success)", bg:"color-mix(in oklab,var(--success) 14%,var(--bg))"}
+};
+
+var bookings = [];
+
+function normalise(b){
+  return {
+    row: b.row||0,
+    status: (b.status||"NEW").toString().toUpperCase(),
+    name: b.name||b.guest||"Guest",
+    whatsapp: b.whatsapp||b.phone||"",
+    gear: b.gear||b.gearpackage||"",
+    date: b.date||"",
+    time: b.time||"",
+    location: b.location||"",
+    payment: b.payment||"",
+    notes: b.notes||"",
+    total: Number(b.total|| (String(b.gear||"").match(/\$(\d+)/)? RegExp.$1:0)) || 0
+  };
+}
+
+function render(){
+  var s = STATUS;
+  var totalRev = bookings.reduce(function(a,b){return a+(b.total||0)},0);
+  el("k-bookings").textContent = bookings.length;
+  el("k-rev").textContent = "$"+ (totalRev>=1000? (totalRev/1000).toFixed(1)+"k" : totalRev);
+  el("k-new").textContent = bookings.filter(function(b){return b.status==="NEW"}).length;
+  el("k-done").textContent = bookings.filter(function(b){return b.status==="DONE"}).length;
+
+  el("bookings").innerHTML = bookings.map(function(b,i){
+    var st = s[b.status]||s.NEW;
+    var wa = digits(b.whatsapp);
+    var waMsg = encodeURIComponent("Hi "+String(b.name).split(" ")[0]+" — Aquatic Paradise here about your booking"+(b.date? " on "+b.date:"")+". ");
+    return '<div class="booking">'
+      +'<div class="row1"><span class="g">'+esc(b.name)+'</span>'
+      +'<span class="pill" style="color:'+st.color+';background:'+st.bg+'">'+st.label+'</span></div>'
+      +'<div class="meta">'+esc(b.date||"date TBC")+' · '+esc(b.time||"")+' · '+esc(b.location||"")+(b.payment? ' · '+esc(b.payment):'')+'</div>'
+      +(b.gear? '<div class="gear">'+esc(b.gear)+'</div>':'')
+      +(b.notes? '<div class="meta" style="font-style:italic;margin-top:6px">“'+esc(b.notes)+'”</div>':'')
+      +'<div class="actions">'
+        +(wa? '<a class="btn wa" target="_blank" rel="noopener" href="https://wa.me/'+wa+'?text='+waMsg+'">💬 WhatsApp</a>'
+             +'<a class="btn" href="tel:+'+wa+'">📞 Call</a>':'')
+        +'<button class="btn'+(b.status==="NEW"?' on':'')+'" data-i="'+i+'" data-st="NEW">New</button>'
+        +'<button class="btn'+(b.status==="ASSIGNED"?' on':'')+'" data-i="'+i+'" data-st="ASSIGNED">Assigned</button>'
+        +'<button class="btn'+(b.status==="DONE"?' on':'')+'" data-i="'+i+'" data-st="DONE">Done</button>'
+      +'</div></div>';
+  }).join("") || '<div class="muted" style="padding:20px 4px">No bookings yet.</div>';
+
+  [].forEach.call(document.querySelectorAll("#bookings [data-st]"),function(btn){
+    btn.addEventListener("click",function(){ setStatus(+btn.dataset.i, btn.dataset.st) });
+  });
+}
+
+function setStatus(i, st){
+  var b = bookings[i]; if(!b) return;
+  b.status = st; render();
+  if(APR_API && APR_API_TOKEN && b.row){
+    fetch(APR_API, {method:"POST", body:JSON.stringify({token:APR_API_TOKEN, row:b.row, status:st})})
+      .catch(function(){ /* offline — will re-sync on next load */ });
+  }
+}
+
+function renderTeam(){
+  el("team").innerHTML = APR_TEAM.map(function(m){
+    var wa = digits(m.wa);
+    var body = encodeURIComponent("Team update from Aquatic Paradise: ");
+    return '<div class="tile"><h3>'+esc(m.name)+'</h3>'
+      +'<div class="muted" style="margin-bottom:10px">'+esc(m.role)+'</div>'
+      +(wa? '<a class="btn wa" target="_blank" rel="noopener" href="https://wa.me/'+wa+'?text='+body+'">💬 Message</a> '
+           +'<a class="btn" href="tel:+'+wa+'">📞 Call</a>'
+          : '<span class="muted">Add number in setup</span>')
+      +'</div>';
+  }).join("");
+}
+
+function loadBookings(){
+  el("ql-form").href = APR_BOOKING_FORM;
+  if(APR_API && APR_API_TOKEN){
+    el("datastate").textContent = "live";
+    el("offline-note").style.display = "none";
+    fetch(APR_API+"?token="+encodeURIComponent(APR_API_TOKEN))
+      .then(function(r){return r.json()})
+      .then(function(j){
+        if(j && j.ok && j.bookings){ bookings = j.bookings.map(normalise); render(); }
+        else throw new Error("bad");
+      })
+      .catch(function(){ el("datastate").textContent="offline — sample"; bookings=DEMO.map(normalise); el("offline-note").style.display="block"; render(); });
+  } else {
+    el("datastate").textContent = "demo data";
+    el("offline-note").style.display = "block";
+    bookings = DEMO.map(normalise); render();
+  }
+}
+
+function boot(){
+  el("gate").style.display="none";
+  el("app").style.display="block";
+  var h = new Date().getHours();
+  el("greet").textContent = (h<12?"Good morning":h<18?"Good afternoon":"Good evening")+", Delroy";
+  renderTeam(); loadBookings();
+}
+
+/* Gate wiring */
+(function(){
+  var pass=el("pass"), unlock=el("unlock");
+  try{ if(sessionStorage.getItem("apr_owner")==="1"){ boot(); } }catch(e){}
+  pass.addEventListener("input",function(){ unlock.disabled=!pass.value; el("err").textContent=""; });
+  el("gate-form").addEventListener("submit",function(ev){
+    ev.preventDefault(); if(!pass.value) return;
+    unlock.disabled=true; unlock.textContent="Checking…";
+    sha256Hex(pass.value).then(function(hex){
+      if(hex===APR_OWNER_HASH){ try{sessionStorage.setItem("apr_owner","1")}catch(e){} boot(); }
+      else { el("err").textContent="Incorrect passcode."; pass.value=""; unlock.textContent="Unlock →"; }
+    });
+  });
+  el("refresh").addEventListener("click",loadBookings);
+  el("signout").addEventListener("click",function(){ try{sessionStorage.removeItem("apr_owner")}catch(e){} location.reload(); });
+})();
+
+/* Offline: register service worker so the dashboard works with no/blocked wifi */
+if("serviceWorker" in navigator){ navigator.serviceWorker.register("sw.js").catch(function(){}); }
+</script>
+</body>
+</html>
