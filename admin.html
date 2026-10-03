@@ -129,7 +129,8 @@
   </div>
 
   <div class="section">
-    <div class="eyebrow">Reach the team (WhatsApp)</div>
+    <div class="eyebrow" style="display:flex;justify-content:space-between;align-items:center">Reach the team (WhatsApp)
+      <button id="team-edit" class="btn" style="padding:6px 11px">✎ Edit numbers</button></div>
     <div class="grid2" id="team"></div>
   </div>
 
@@ -240,17 +241,43 @@ function setStatus(i, st){
   }
 }
 
+// Team numbers are saved privately in THIS browser (localStorage) — never in
+// the public page source — so staff personal numbers aren't exposed online.
+function teamNums(){ try{return JSON.parse(localStorage.getItem("apr_team_nums")||"{}")}catch(e){return {}} }
+function saveTeamNums(o){ try{localStorage.setItem("apr_team_nums",JSON.stringify(o))}catch(e){} }
+
 function renderTeam(){
+  var saved = teamNums();
   el("team").innerHTML = APR_TEAM.map(function(m){
-    var wa = digits(m.wa);
+    var wa = digits(saved[m.name] || m.wa);
     var body = encodeURIComponent("Team update from Aquatic Paradise: ");
     return '<div class="tile"><h3>'+esc(m.name)+'</h3>'
       +'<div class="muted" style="margin-bottom:10px">'+esc(m.role)+'</div>'
       +(wa? '<a class="btn wa" target="_blank" rel="noopener" href="https://wa.me/'+wa+'?text='+body+'">💬 Message</a> '
            +'<a class="btn" href="tel:+'+wa+'">📞 Call</a>'
-          : '<span class="muted">Add number in setup</span>')
+          : '<span class="muted">Tap “Edit numbers” to add</span>')
       +'</div>';
   }).join("");
+}
+
+function openTeamEditor(){
+  var saved = teamNums();
+  el("team").innerHTML = APR_TEAM.map(function(m){
+    return '<div class="tile"><h3>'+esc(m.name)+'</h3>'
+      +'<div class="muted" style="margin-bottom:8px">'+esc(m.role)+'</div>'
+      +'<input data-name="'+esc(m.name)+'" value="'+esc(saved[m.name]||m.wa||"")+'" placeholder="digits only, e.g. 1784XXXXXXX"'
+      +'style="width:100%;padding:10px;border-radius:10px;border:1px solid var(--ruleStrong);background:var(--bg);font-family:var(--mono);font-size:13px;color:var(--ink)"/></div>';
+  }).join("")
+  + '<div style="grid-column:1/-1;display:flex;gap:8px;margin-top:2px">'
+  + '<button class="btn dark" id="team-save">Save numbers</button>'
+  + '<button class="btn" id="team-cancel">Cancel</button>'
+  + '<span class="muted" style="align-self:center">Digits only, country code first. Saved only on this device.</span></div>';
+  el("team-save").onclick=function(){
+    var o = teamNums();
+    [].forEach.call(document.querySelectorAll("#team input[data-name]"),function(inp){ o[inp.getAttribute("data-name")]=digits(inp.value); });
+    saveTeamNums(o); renderTeam();
+  };
+  el("team-cancel").onclick=renderTeam;
 }
 
 function loadBookings(){
@@ -278,6 +305,7 @@ function boot(){
   var h = new Date().getHours();
   el("greet").textContent = (h<12?"Good morning":h<18?"Good afternoon":"Good evening")+", Delroy";
   renderTeam(); loadBookings();
+  el("team-edit").addEventListener("click", openTeamEditor);
 }
 
 /* Gate wiring */
