@@ -24,22 +24,19 @@
   body{background:var(--bg);color:var(--ink);font-family:var(--ui);-webkit-font-smoothing:antialiased}
   a{color:inherit}
   .eyebrow{font-size:10px;font-weight:600;letter-spacing:2.2px;text-transform:uppercase;color:var(--inkSoft)}
-  .display{font-family:var(--display)}
   .mono{font-family:var(--mono)}
   button{font-family:var(--ui);cursor:pointer}
 
-  /* Gate */
   #gate{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;padding:24px;z-index:100}
   #gate .card{width:100%;max-width:360px;background:var(--paper);border:1px solid var(--rule);border-radius:22px;padding:30px 26px 26px;text-align:center;box-shadow:0 24px 60px rgba(15,18,22,.14)}
   #gate img{width:62px;height:62px;border-radius:999px;object-fit:cover;border:2px solid var(--bg)}
   #gate h1{font-family:var(--display);font-size:26px;font-weight:500;margin:14px 0 2px;letter-spacing:-.3px}
   #gate .sub{font-size:10px;letter-spacing:2.4px;text-transform:uppercase;color:var(--inkSoft);font-weight:600}
-  #gate input{width:100%;margin-top:22px;padding:14px 16px;border-radius:12px;border:1px solid var(--ruleStrong);background:var(--bg);color:var(--ink);font-size:15px;text-align:center;letter-spacing:1px;outline:none}
-  #gate .err{height:18px;margin-top:6px;color:var(--danger);font-size:11.5px;font-weight:600}
+  #gate input{width:100%;margin-top:22px;padding:14px 16px;border-radius:12px;border:1px solid var(--ruleStrong);background:var(--bg);color:var(--ink);font-size:22px;text-align:center;letter-spacing:8px;outline:none;font-family:var(--mono)}
+  #gate .err{min-height:18px;margin-top:8px;color:var(--danger);font-size:11.5px;font-weight:600}
   #gate button{width:100%;padding:15px;border:none;border-radius:999px;background:var(--gold);color:#fff;font-size:12px;font-weight:600;letter-spacing:1.6px;text-transform:uppercase}
   #gate button:disabled{background:var(--inkFaint)}
 
-  /* App */
   #app{display:none;max-width:920px;margin:0 auto;padding:0 16px 60px}
   header.top{position:sticky;top:0;background:rgba(251,247,238,.85);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid var(--rule);
     display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 4px;margin-bottom:4px;z-index:20}
@@ -60,13 +57,14 @@
   .section{margin-top:26px}
   .section > .eyebrow{margin:0 4px 10px}
   .banner{background:color-mix(in oklab,var(--gold) 12%,var(--bg));border:1px solid var(--rule);border-left:3px solid var(--gold);border-radius:10px;padding:10px 14px;font-size:12.5px;color:var(--ink);margin:0 0 14px}
+  .banner.err{background:color-mix(in oklab,var(--danger) 10%,var(--bg));border-left-color:var(--danger)}
 
   .booking{background:var(--paper);border:1px solid var(--rule);border-radius:16px;padding:14px 16px;margin-bottom:10px}
   .booking .row1{display:flex;justify-content:space-between;align-items:center;gap:8px}
   .booking .g{font-family:var(--display);font-size:19px;font-weight:500}
   .booking .meta{font-size:12px;color:var(--inkSoft);margin-top:3px}
   .booking .gear{font-family:var(--mono);font-size:10px;color:var(--brand);margin-top:6px}
-  .pill{display:inline-flex;align-items:center;gap:5px;padding:3px 10px 4px;border-radius:999px;font-size:10px;font-weight:600;letter-spacing:.6px;text-transform:uppercase}
+  .pill{display:inline-flex;align-items:center;gap:5px;padding:3px 10px 4px;border-radius:999px;font-size:10px;font-weight:600;letter-spacing:.6px;text-transform:uppercase;white-space:nowrap}
   .actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
   .btn{padding:9px 13px;border-radius:999px;border:1px solid var(--ruleStrong);background:var(--paper);color:var(--ink);font-size:10.5px;font-weight:600;letter-spacing:1px;text-transform:uppercase;display:inline-flex;align-items:center;gap:6px;text-decoration:none}
   .btn.wa{background:#25D366;color:#fff;border-color:#25D366}
@@ -84,20 +82,18 @@
 </head>
 <body>
 
-<!-- Passcode gate -->
 <div id="gate">
   <form class="card" id="gate-form">
     <img src="assets/logo.jpeg" alt=""/>
     <h1>Aquatic Paradise</h1>
     <div class="sub">Owner Command Center</div>
-    <input id="pass" type="password" autocomplete="current-password" placeholder="Owner passcode"/>
+    <input id="pin" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="4" autocomplete="off" placeholder="PIN"/>
     <div class="err" id="err"></div>
-    <button type="submit" id="unlock" disabled>Unlock →</button>
-    <div style="margin-top:16px" class="muted">Owner access only · Bequia, SVG</div>
+    <button type="submit" id="unlock" disabled>Sign in →</button>
+    <div style="margin-top:16px" class="muted">Owner access · 4-digit admin PIN</div>
   </form>
 </div>
 
-<!-- Dashboard -->
 <div id="app">
   <header class="top">
     <div class="brand">
@@ -112,20 +108,20 @@
 
   <div class="hd">
     <h2 id="greet">Today at a glance</h2>
-    <span class="muted" id="datastate">demo data</span>
+    <span class="muted" id="datastate">connecting…</span>
   </div>
 
   <div class="kpis">
-    <div class="kpi"><div class="n" id="k-bookings">0</div><div class="l">Bookings</div></div>
-    <div class="kpi"><div class="n" id="k-rev">$0</div><div class="l">Est. XCD</div></div>
-    <div class="kpi"><div class="n" id="k-new">0</div><div class="l">Need action</div></div>
-    <div class="kpi"><div class="n" id="k-done">0</div><div class="l">Done</div></div>
+    <div class="kpi"><div class="n" id="k-bookings">—</div><div class="l">Bookings</div></div>
+    <div class="kpi"><div class="n" id="k-rev">—</div><div class="l">Revenue XCD</div></div>
+    <div class="kpi"><div class="n" id="k-pending">—</div><div class="l">Pending</div></div>
+    <div class="kpi"><div class="n" id="k-deposits">—</div><div class="l">Deposits in</div></div>
   </div>
 
   <div class="section">
-    <div class="eyebrow">Bookings</div>
-    <div id="offline-note" class="banner" style="display:none">Showing sample data. Connect your live booking sheet in the setup to see real submissions here.</div>
-    <div id="bookings"></div>
+    <div class="eyebrow">Recent bookings</div>
+    <div id="state-note" class="banner" style="display:none"></div>
+    <div id="bookings"><div class="muted" style="padding:20px 4px">Loading…</div></div>
   </div>
 
   <div class="section">
@@ -143,106 +139,131 @@
     </div>
   </div>
 
-  <div class="foot" id="foot">Aquatic Paradise ISUP Rentals · Bequia, SVG</div>
+  <div class="foot">Aquatic Paradise ISUP Rentals · Bequia, SVG</div>
 </div>
 
 <script>
-/* ---------- CONFIG (edit these) ---------------------------------- */
-// SHA-256 of the OWNER passcode. Default word: paradise-owner-2026
-var APR_OWNER_HASH = "2d058943240b5edb8e7c9fe7ee162b571e3ac191c8a3868eb7b4f83aafa2262b";
+/* ---------- CONFIG ---------------------------------------------- */
+// Live backend (APR Master App Web App). Safe to keep here: it returns
+// nothing without a valid token, and the dashboard gets its token only by
+// passing your PIN to verifyPin — no secret ever lives in this file.
+var APR_API = "https://script.google.com/macros/s/AKfycbxnvG3dTUs-nSVowi9P6jqyDsubYFR7VHWcNvNAJplzR0BQpDr2n3blKx34x0fOdfT8-w/exec";
 var APR_BOOKING_FORM = "https://docs.google.com/forms/d/e/1FAIpQLSdXT9U010JTZ6MJHf7Afb7hzXq-xvss3ml9CfUdrgwSlH4Lbg/viewform";
-// Live data (optional): paste your Apps Script Web App URL + token to see real bookings.
-var APR_API = "";           // e.g. https://script.google.com/macros/s/AKfy.../exec
-var APR_API_TOKEN = "";     // must match the API_TOKEN Script property
-// Team WhatsApp numbers (digits only, country code first). Fill in real numbers.
+// Team broadcast contacts (digits only, country code first).
 var APR_TEAM = [
   { name: "Delroy (Owner)", role: "Owner — on water", wa: "17844963447" },
-  { name: "Shamar Daize",   role: "Delivery & Ops",   wa: "" },
-  { name: "Dravin Lewis",   role: "Delivery & Ops",   wa: "" }
+  { name: "Shamar Daize",   role: "Delivery & Ops",   wa: "17844340530" },
+  { name: "Dravin Lewis",   role: "Delivery & Ops",   wa: "17845325218" }
 ];
-/* ---------------------------------------------------------------- */
+/* --------------------------------------------------------------- */
 
-var DEMO = [
-  { row:0, status:"NEW",       name:"Margaux & Henri Bernier", whatsapp:"+33 6 14 22 89 04", gear:"2× Paddle Board + Snorkel Kit", date:"2026-06-20", time:"09:00", location:"Princess Margaret Beach", payment:"Online — paid", notes:"Honeymoon — welcome card please.", total:270 },
-  { row:0, status:"ASSIGNED", name:"Tana Whitfield",          whatsapp:"+1 246 822 0014",   gear:"Double Kayak + Beach Setup",   date:"2026-06-20", time:"10:30", location:"Lower Bay",              payment:"Cash on delivery", notes:"Fabric PFD (neoprene allergy).", total:170 },
-  { row:0, status:"DONE",     name:"Rashida Forbes +3",       whatsapp:"+1 784 433 9912",   gear:"Kayak + Beach Setup",          date:"2026-06-20", time:"14:00", location:"Princess Margaret Beach", payment:"Online — paid", notes:"Birthday group, 2 non-swimmers.", total:220 }
-];
+var TOKEN = null;
+var bookings = [];
 
-function sha256Hex(str){
-  return crypto.subtle.digest("SHA-256", new TextEncoder().encode(str))
-    .then(function(b){return [].map.call(new Uint8Array(b),function(x){return x.toString(16).padStart(2,"0")}).join("")});
-}
+var STATUS = {
+  pending:    {label:"Pending",    color:"var(--gold)",    bg:"color-mix(in oklab,var(--gold) 16%,var(--bg))"},
+  confirmed:  {label:"Confirmed",  color:"var(--brand)",   bg:"color-mix(in oklab,var(--brand) 14%,var(--bg))"},
+  delivering: {label:"Delivering", color:"var(--coral)",   bg:"color-mix(in oklab,var(--coral) 16%,var(--bg))"},
+  done:       {label:"Done",       color:"var(--success)", bg:"color-mix(in oklab,var(--success) 14%,var(--bg))"}
+};
+var STATUS_FLOW = ["pending","confirmed","delivering","done"];
+
 function el(id){return document.getElementById(id)}
 function esc(s){return String(s==null?"":s).replace(/[&<>]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;"}[c]})}
 function digits(s){return String(s||"").replace(/[^0-9]/g,"")}
+function na(v){ v = (v==null?"":String(v)).trim(); return (!v || v==="N/A") ? "" : v; }
 
-var STATUS = {
-  NEW:      {label:"New",      color:"var(--gold)",    bg:"color-mix(in oklab,var(--gold) 16%,var(--bg))"},
-  ASSIGNED: {label:"Assigned", color:"var(--brand)",   bg:"color-mix(in oklab,var(--brand) 14%,var(--bg))"},
-  DONE:     {label:"Done",     color:"var(--success)", bg:"color-mix(in oklab,var(--success) 14%,var(--bg))"}
-};
-
-var bookings = [];
-
-function normalise(b){
-  return {
-    row: b.row||0,
-    status: (b.status||"NEW").toString().toUpperCase(),
-    name: b.name||b.guest||"Guest",
-    whatsapp: b.whatsapp||b.phone||"",
-    gear: b.gear||b.gearpackage||"",
-    date: b.date||"",
-    time: b.time||"",
-    location: b.location||"",
-    payment: b.payment||"",
-    notes: b.notes||"",
-    total: Number(b.total|| (String(b.gear||"").match(/\$(\d+)/)? RegExp.$1:0)) || 0
-  };
+// POST as text/plain so the browser skips the CORS preflight that Apps Script
+// can't answer; the backend reads the raw body and JSON.parses it regardless.
+function api(payload){
+  return fetch(APR_API, {
+    method:"POST",
+    headers:{"Content-Type":"text/plain;charset=utf-8"},
+    body:JSON.stringify(payload),
+    redirect:"follow"
+  }).then(function(r){ return r.json(); });
 }
 
+/* ---- Bookings ------------------------------------------------- */
+function money(n){ n = Number(n)||0; return n>=1000 ? "$"+(n/1000).toFixed(1)+"k" : "$"+Math.round(n); }
+
 function render(){
-  var s = STATUS;
-  var totalRev = bookings.reduce(function(a,b){return a+(b.total||0)},0);
+  var totalRev = bookings.reduce(function(a,b){return a+(Number(b.total)||0)},0);
+  var depIn = bookings.filter(function(b){return String(b.depositStatus)==="received"}).length;
   el("k-bookings").textContent = bookings.length;
-  el("k-rev").textContent = "$"+ (totalRev>=1000? (totalRev/1000).toFixed(1)+"k" : totalRev);
-  el("k-new").textContent = bookings.filter(function(b){return b.status==="NEW"}).length;
-  el("k-done").textContent = bookings.filter(function(b){return b.status==="DONE"}).length;
+  el("k-rev").textContent = money(totalRev);
+  el("k-pending").textContent = bookings.filter(function(b){return (b.status||"pending")==="pending"}).length;
+  el("k-deposits").textContent = depIn;
 
   el("bookings").innerHTML = bookings.map(function(b,i){
-    var st = s[b.status]||s.NEW;
-    var wa = digits(b.whatsapp);
-    var waMsg = encodeURIComponent("Hi "+String(b.name).split(" ")[0]+" — Aquatic Paradise here about your booking"+(b.date? " on "+b.date:"")+". ");
+    var status = na(b.status) || "pending";
+    var st = STATUS[status] || STATUS.pending;
+    var name = (na(b.fname)+" "+na(b.lname)).trim() || "Guest";
+    var wa = digits(b.phone);
+    var when = na(b.datetime).replace("T"," ");
+    var dep = String(b.depositStatus)==="received" ? ("· deposit XCD "+(Number(b.depositAmount)||0)) : "· no deposit";
+    var waMsg = encodeURIComponent("Hi "+name.split(" ")[0]+" — Aquatic Paradise here about booking "+na(b.ref)+(when?" ("+when+")":"")+". ");
+    var btns = STATUS_FLOW.map(function(s){
+      return '<button class="btn'+(status===s?' on':'')+'" data-ref="'+esc(b.ref)+'" data-st="'+s+'">'+STATUS[s].label+'</button>';
+    }).join("");
     return '<div class="booking">'
-      +'<div class="row1"><span class="g">'+esc(b.name)+'</span>'
+      +'<div class="row1"><span class="g">'+esc(name)+'</span>'
       +'<span class="pill" style="color:'+st.color+';background:'+st.bg+'">'+st.label+'</span></div>'
-      +'<div class="meta">'+esc(b.date||"date TBC")+' · '+esc(b.time||"")+' · '+esc(b.location||"")+(b.payment? ' · '+esc(b.payment):'')+'</div>'
-      +(b.gear? '<div class="gear">'+esc(b.gear)+'</div>':'')
-      +(b.notes? '<div class="meta" style="font-style:italic;margin-top:6px">“'+esc(b.notes)+'”</div>':'')
+      +'<div class="meta">'+esc(na(b.ref))+(when?' · '+esc(when):'')+(na(b.duration)?' · '+esc(na(b.duration)):'')+' · XCD '+(Number(b.total)||0)+' '+esc(dep)+'</div>'
+      +(na(b.gear)?'<div class="gear">'+esc(na(b.gear))+'</div>':'')
+      +(na(b.notes)?'<div class="meta" style="font-style:italic;margin-top:6px">“'+esc(na(b.notes))+'”</div>':'')
       +'<div class="actions">'
-        +(wa? '<a class="btn wa" target="_blank" rel="noopener" href="https://wa.me/'+wa+'?text='+waMsg+'">💬 WhatsApp</a>'
+        +(wa?'<a class="btn wa" target="_blank" rel="noopener" href="https://wa.me/'+wa+'?text='+waMsg+'">💬 WhatsApp</a>'
              +'<a class="btn" href="tel:+'+wa+'">📞 Call</a>':'')
-        +'<button class="btn'+(b.status==="NEW"?' on':'')+'" data-i="'+i+'" data-st="NEW">New</button>'
-        +'<button class="btn'+(b.status==="ASSIGNED"?' on':'')+'" data-i="'+i+'" data-st="ASSIGNED">Assigned</button>'
-        +'<button class="btn'+(b.status==="DONE"?' on':'')+'" data-i="'+i+'" data-st="DONE">Done</button>'
+        +btns
       +'</div></div>';
   }).join("") || '<div class="muted" style="padding:20px 4px">No bookings yet.</div>';
 
   [].forEach.call(document.querySelectorAll("#bookings [data-st]"),function(btn){
-    btn.addEventListener("click",function(){ setStatus(+btn.dataset.i, btn.dataset.st) });
+    btn.addEventListener("click",function(){ setStatus(btn.getAttribute("data-ref"), btn.getAttribute("data-st")); });
   });
 }
 
-function setStatus(i, st){
-  var b = bookings[i]; if(!b) return;
-  b.status = st; render();
-  if(APR_API && APR_API_TOKEN && b.row){
-    fetch(APR_API, {method:"POST", body:JSON.stringify({token:APR_API_TOKEN, row:b.row, status:st})})
-      .catch(function(){ /* offline — will re-sync on next load */ });
-  }
+function setStatus(ref, status){
+  var b = bookings.filter(function(x){return String(x.ref)===String(ref)})[0];
+  if(!b) return;
+  var prev = b.status; b.status = status; render();
+  api({action:"update_status", token:TOKEN, ref:ref, status:status}).then(function(res){
+    if(!res || !res.ok){ b.status = prev; render(); note("Couldn't update status: "+((res&&res.error)||"try again"), true); }
+  }).catch(function(){ b.status = prev; render(); note("Offline — status change not saved.", true); });
 }
 
-// Team numbers are saved privately in THIS browser (localStorage) — never in
-// the public page source — so staff personal numbers aren't exposed online.
+function note(msg, isErr){
+  var n = el("state-note");
+  n.textContent = msg; n.style.display = msg ? "block" : "none";
+  n.className = "banner" + (isErr ? " err" : "");
+}
+
+function loadBookings(){
+  el("ql-form").href = APR_BOOKING_FORM;
+  el("datastate").textContent = "loading…";
+  api({action:"getBookings", token:TOKEN}).then(function(res){
+    if(res && res.ok && Array.isArray(res.bookings)){
+      bookings = res.bookings;
+      el("datastate").textContent = "live · "+bookings.length;
+      note("");
+      render();
+    } else if(res && /unauthor/i.test(res.error||"")){
+      note("Session expired — sign in again.", true);
+      signOut();
+    } else {
+      el("datastate").textContent = "error";
+      note("Backend error: "+((res&&res.error)||"unknown")+".", true);
+      bookings = []; render();
+    }
+  }).catch(function(){
+    el("datastate").textContent = "offline";
+    note("Can't reach the backend (offline, or the Web App URL/deployment changed).", true);
+    bookings = []; render();
+  });
+}
+
+/* ---- Team ----------------------------------------------------- */
 function teamNums(){ try{return JSON.parse(localStorage.getItem("apr_team_nums")||"{}")}catch(e){return {}} }
 function saveTeamNums(o){ try{localStorage.setItem("apr_team_nums",JSON.stringify(o))}catch(e){} }
 
@@ -253,25 +274,24 @@ function renderTeam(){
     var body = encodeURIComponent("Team update from Aquatic Paradise: ");
     return '<div class="tile"><h3>'+esc(m.name)+'</h3>'
       +'<div class="muted" style="margin-bottom:10px">'+esc(m.role)+'</div>'
-      +(wa? '<a class="btn wa" target="_blank" rel="noopener" href="https://wa.me/'+wa+'?text='+body+'">💬 Message</a> '
+      +(wa?'<a class="btn wa" target="_blank" rel="noopener" href="https://wa.me/'+wa+'?text='+body+'">💬 Message</a> '
            +'<a class="btn" href="tel:+'+wa+'">📞 Call</a>'
-          : '<span class="muted">Tap “Edit numbers” to add</span>')
+          :'<span class="muted">Tap “Edit numbers” to add</span>')
       +'</div>';
   }).join("");
 }
-
 function openTeamEditor(){
   var saved = teamNums();
   el("team").innerHTML = APR_TEAM.map(function(m){
     return '<div class="tile"><h3>'+esc(m.name)+'</h3>'
       +'<div class="muted" style="margin-bottom:8px">'+esc(m.role)+'</div>'
-      +'<input data-name="'+esc(m.name)+'" value="'+esc(saved[m.name]||m.wa||"")+'" placeholder="digits only, e.g. 1784XXXXXXX"'
+      +'<input data-name="'+esc(m.name)+'" value="'+esc(saved[m.name]||m.wa||"")+'" placeholder="digits only, e.g. 1784XXXXXXX" '
       +'style="width:100%;padding:10px;border-radius:10px;border:1px solid var(--ruleStrong);background:var(--bg);font-family:var(--mono);font-size:13px;color:var(--ink)"/></div>';
   }).join("")
   + '<div style="grid-column:1/-1;display:flex;gap:8px;margin-top:2px">'
   + '<button class="btn dark" id="team-save">Save numbers</button>'
   + '<button class="btn" id="team-cancel">Cancel</button>'
-  + '<span class="muted" style="align-self:center">Digits only, country code first. Saved only on this device.</span></div>';
+  + '<span class="muted" style="align-self:center">Saved only on this device.</span></div>';
   el("team-save").onclick=function(){
     var o = teamNums();
     [].forEach.call(document.querySelectorAll("#team input[data-name]"),function(inp){ o[inp.getAttribute("data-name")]=digits(inp.value); });
@@ -280,52 +300,40 @@ function openTeamEditor(){
   el("team-cancel").onclick=renderTeam;
 }
 
-function loadBookings(){
-  el("ql-form").href = APR_BOOKING_FORM;
-  if(APR_API && APR_API_TOKEN){
-    el("datastate").textContent = "live";
-    el("offline-note").style.display = "none";
-    fetch(APR_API+"?token="+encodeURIComponent(APR_API_TOKEN))
-      .then(function(r){return r.json()})
-      .then(function(j){
-        if(j && j.ok && j.bookings){ bookings = j.bookings.map(normalise); render(); }
-        else throw new Error("bad");
-      })
-      .catch(function(){ el("datastate").textContent="offline — sample"; bookings=DEMO.map(normalise); el("offline-note").style.display="block"; render(); });
-  } else {
-    el("datastate").textContent = "demo data";
-    el("offline-note").style.display = "block";
-    bookings = DEMO.map(normalise); render();
-  }
-}
-
+/* ---- Session -------------------------------------------------- */
 function boot(){
   el("gate").style.display="none";
   el("app").style.display="block";
   var h = new Date().getHours();
   el("greet").textContent = (h<12?"Good morning":h<18?"Good afternoon":"Good evening")+", Delroy";
-  renderTeam(); loadBookings();
+  renderTeam();
   el("team-edit").addEventListener("click", openTeamEditor);
+  loadBookings();
 }
+function signOut(){ TOKEN=null; try{sessionStorage.removeItem("apr_token")}catch(e){} location.reload(); }
 
-/* Gate wiring */
 (function(){
-  var pass=el("pass"), unlock=el("unlock");
-  try{ if(sessionStorage.getItem("apr_owner")==="1"){ boot(); } }catch(e){}
-  pass.addEventListener("input",function(){ unlock.disabled=!pass.value; el("err").textContent=""; });
+  try{ var t=sessionStorage.getItem("apr_token"); if(t){ TOKEN=t; boot(); } }catch(e){}
+  var pin=el("pin"), unlock=el("unlock");
+  pin.addEventListener("input",function(){ pin.value=pin.value.replace(/\D/g,"").slice(0,4); unlock.disabled=pin.value.length!==4; el("err").textContent=""; });
   el("gate-form").addEventListener("submit",function(ev){
-    ev.preventDefault(); if(!pass.value) return;
+    ev.preventDefault(); if(pin.value.length!==4) return;
     unlock.disabled=true; unlock.textContent="Checking…";
-    sha256Hex(pass.value).then(function(hex){
-      if(hex===APR_OWNER_HASH){ try{sessionStorage.setItem("apr_owner","1")}catch(e){} boot(); }
-      else { el("err").textContent="Incorrect passcode."; pass.value=""; unlock.textContent="Unlock →"; }
+    api({action:"verifyPin", role:"admin", pin:pin.value}).then(function(res){
+      if(res && res.ok && res.token){
+        TOKEN=res.token; try{sessionStorage.setItem("apr_token",TOKEN)}catch(e){}
+        boot();
+      } else {
+        el("err").textContent = (res&&res.error) || "Incorrect PIN"; pin.value=""; unlock.textContent="Sign in →"; unlock.disabled=true;
+      }
+    }).catch(function(){
+      el("err").textContent="Can't reach the backend — check connection."; unlock.textContent="Sign in →"; unlock.disabled=false;
     });
   });
   el("refresh").addEventListener("click",loadBookings);
-  el("signout").addEventListener("click",function(){ try{sessionStorage.removeItem("apr_owner")}catch(e){} location.reload(); });
+  el("signout").addEventListener("click",signOut);
 })();
 
-/* Offline: register service worker so the dashboard works with no/blocked wifi */
 if("serviceWorker" in navigator){ navigator.serviceWorker.register("sw.js").catch(function(){}); }
 </script>
 </body>
